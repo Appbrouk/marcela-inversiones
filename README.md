@@ -50,22 +50,79 @@ npx vercel        # preview
 npx vercel --prod # producción
 ```
 
-## Formulario de registro
+## Formulario de registro → HubSpot
 
-Por defecto el formulario está en **modo demo**: valida los campos y muestra el
-mensaje de éxito sin enviar nada a ningún servidor.
+El formulario envía los datos a la **Forms API de HubSpot** directamente desde el
+navegador. No hay backend ni claves secretas: `portalId` y `formGuid` son públicos
+(aparecen en cualquier formulario embebido de HubSpot).
 
-Para conectarlo a un servicio real, define la URL en `js/main.js`:
+### 1. Crear el formulario en HubSpot
+
+En HubSpot: **Marketing → Formularios → Crear formulario**, con estas propiedades
+de contacto:
+
+| Campo del sitio | Propiedad en HubSpot   |
+|-----------------|------------------------|
+| Nombre          | `firstname` + `lastname` |
+| Email           | `email`                |
+| Teléfono        | `phone`                |
+
+El campo *Nombre* es uno solo en el sitio: la primera palabra se guarda como
+`firstname` y el resto como `lastname` ("María José Pérez" → `María` / `José Pérez`).
+Si necesitas la separación exacta, conviene dividir el campo en el HTML.
+
+### 2. Pegar los identificadores
+
+En `js/main.js`, al inicio:
 
 ```js
-const FORM_ENDPOINT = ''; // ej.: 'https://formspree.io/f/xxxxxxxx'
+const HUBSPOT = {
+  portalId: '',            // tu Hub ID
+  formGuid: '',            // el ID del formulario
+  region: 'na1',           // 'eu1' si tu portal es europeo
+  subscriptionTypeId: 0,   // ver punto 3
+};
 ```
 
-El endpoint recibe un `POST` con `Content-Type: application/json` y el cuerpo
+Ambos valores están en **Compartir / Insertar** del formulario, dentro del
+fragmento de código (`portalId` y `formId`).
+
+Mientras estén vacíos el sitio queda en **modo demo**: valida y muestra el mensaje
+de éxito sin enviar nada.
+
+### 3. Consentimiento (RGPD)
+
+Solo si el formulario tiene activadas las opciones de consentimiento en HubSpot.
+Pon en `subscriptionTypeId` el ID del tipo de suscripción y el checkbox
+"Acepto recibir información de MD Invest" se enviará como consentimiento explícito.
+Si lo dejas en `0` no se envía el bloque de consentimiento — que es lo correcto
+cuando el formulario de HubSpot no lo pide, porque enviarlo de más da error.
+
+### 4. Atribución de origen (opcional)
+
+Para que HubSpot registre de dónde viene cada contacto, descomenta el script de
+seguimiento al final de `index.html` y reemplaza `NNNNNNN` por tu Hub ID. El sitio
+lee la cookie `hubspotutk` y la adjunta como `context.hutk`.
+
+Instala cookies en el navegador de quien visita: revisa tu política de privacidad
+antes de activarlo. Sin el script el contacto se crea igual, solo que sin atribución.
+
+### Errores
+
+Si HubSpot rechaza el envío, el motivo aparece bajo el botón (por ejemplo, un email
+inválido) y se puede reintentar sin perder lo escrito. Ante un fallo de red o del
+portal se muestra un mensaje genérico con la alternativa de WhatsApp.
+
+### Sin HubSpot
+
+Si prefieres otro destino, deja `HUBSPOT` vacío y define `FORM_ENDPOINT` en
+`js/main.js` con una URL que reciba un `POST` JSON
 `{ nombre, email, telefono, acepta, origen }`.
 
 ## Pendientes conocidos
 
+- **Pegar `portalId` y `formGuid` de HubSpot** en `js/main.js`. Hasta entonces el
+  formulario no envía nada: muestra el éxito en modo demo y los registros se pierden.
 - Los proyectos 1, 2 y 3 usan placeholders. Reemplaza el `<div class="ph …">` de
   cada tarjeta por `<img src="assets/proyecto-N.jpg" alt="…">` cuando existan las fotos.
 - Los enlaces de *Términos y condiciones*, *Política de privacidad*, LinkedIn y

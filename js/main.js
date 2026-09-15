@@ -8,8 +8,32 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
-  /* Endpoint del formulario. Vacío = modo demo (muestra el éxito sin enviar).
-     Ej.: 'https://formspree.io/f/xxxxxxx' o un webhook propio que reciba JSON. */
+  /* ---------- HubSpot ----------
+     El formulario se envía a la Forms API de HubSpot. `portalId` y `formGuid` no son
+     secretos: van a la vista en cualquier formulario embebido de HubSpot, así que
+     pueden vivir aquí. Los datos salen del navegador directo a HubSpot, sin backend.
+
+     Para obtenerlos: HubSpot → Marketing → Formularios → crea o abre el formulario →
+     Compartir / Insertar. En el fragmento aparecen `portalId` (tu Hub ID) y `formId`.
+
+     El formulario en HubSpot debe tener al menos estas propiedades de contacto:
+     firstname, lastname, email, phone.
+
+     Mientras `portalId` o `formGuid` estén vacíos, el sitio sigue en modo demo
+     (valida y muestra el éxito sin enviar nada). */
+  const HUBSPOT = {
+    portalId: '',
+    formGuid: '',
+    /* Región del portal: 'na1' (por defecto), 'eu1', etc. Aparece en la URL de HubSpot. */
+    region: 'na1',
+    /* Solo si el formulario tiene activado el consentimiento (RGPD) en HubSpot.
+       Es el ID del tipo de suscripción; déjalo en 0 si no lo usas. */
+    subscriptionTypeId: 0,
+  };
+
+  /* Alternativa sin HubSpot: un endpoint propio que reciba el JSON tal cual
+     (Formspree, un webhook, una función serverless). Se usa solo si HUBSPOT
+     no está configurado. */
   const FORM_ENDPOINT = '';
 
   /* ---------- Intro (una vez por sesión) ---------- */
@@ -254,22 +278,107 @@
   }
 
   /* ---------- Registro ---------- */
+  const hubspotReady = () => Boolean(HUBSPOT.portalId && HUBSPOT.formGuid);
+
+  const hubspotUrl = () => {
+    const host = HUBSPOT.region && HUBSPOT.region !== 'na1'
+      ? 'https://api-' + HUBSPOT.region + '.hsforms.com'
+      : 'https://api.hsforms.com';
+    return host + '/submissions/v3/integration/submit/' + HUBSPOT.portalId + '/' + HUBSPOT.formGuid;
+  };
+
+  /* Cookie de seguimiento de HubSpot. Solo existe si se carga el script de
+     tracking (ver index.html); sin ella el contacto se crea igual, pero sin
+     atribución de origen. */
+  const cookie = (name) => {
+    const m = d.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  };
+
+  /* El formulario pide un solo campo "Nombre"; HubSpot guarda nombre y apellido
+     por separado. Primera palabra = nombre, el resto = apellido. */
+  const splitNombre = (full) => {
+    const parts = String(full || '').trim().split(/\s+/).filter(Boolean);
+    return { firstname: parts[0] || '', lastname: parts.slice(1).join(' ') };
+  };
+
+  const hubspotPayload = (data) => {
+    const { firstname, lastname } = splitNombre(data.nombre);
+    const fields = [
+      { objectTypeId: '0-1', name: 'firstname', value: firstname },
+      { objectTypeId: '0-1', name: 'email', value: data.email || '' },
+    ];
+    if (lastname) fields.push({ objectTypeId: '0-1', name: 'lastname', value: lastname });
+    if (data.telefono) fields.push({ objectTypeId: '0-1', name: 'phone', value: data.telefono });
+
+    const payload = { fields, context: { pageUri: location.href, pageName: d.title } };
+    const hutk = cookie('hubspotutk');
+    if (hutk) payload.context.hutk = hutk;
+
+    if (HUBSPOT.subscriptionTypeId) {
+      const text = 'Acepto recibir información de MD Invest';
+      payload.legalConsentOptions = {
+        consent: {
+          consentToProcess: true,
+          text,
+          communications: [
+            { value: true, subscriptionTypeId: HUBSPOT.subscriptionTypeId, text },
+          ],
+        },
+      };
+    }
+    return payload;
+  };
+
+  const sendToHubspot = async (data) => {
+    const res = await fetch(hubspotUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(hubspotPayload(data)),
+    });
+    if (res.ok) return;
+    /* HubSpot responde el detalle del error en JSON; sirve para distinguir un
+       email inválido (recuperable por la persona) de un portal mal configurado. */
+    let detail = 'HTTP ' + res.status;
+    try {
+      const body = await res.json();
+      if (body && Array.isArray(body.errors) && body.errors.length) {
+        detail = body.errors.map((x) => x.message).join(' · ');
+      } else if (body && body.message) {
+        detail = body.message;
+      }
+    } catch (e) {}
+    const err = new Error(detail);
+    err.invalidInput = res.status === 400 && /email|phone|fields\./i.test(detail);
+    throw err;
+  };
+
   const form = d.getElementById('form-registro');
   const ok = d.getElementById('registro-ok');
   if (form && ok) {
     const acepta = form.querySelector('#acepta');
     const submit = form.querySelector('button[type="submit"]');
+    const error = d.getElementById('registro-error');
     acepta.addEventListener('change', () => { submit.disabled = !acepta.checked; });
+
+    const showError = (msg) => {
+      if (!error) { alert(msg); return; }
+      error.textContent = msg;
+      error.hidden = false;
+    };
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!form.reportValidity()) return;
+      if (error) error.hidden = true;
       submit.disabled = true;
       submit.classList.add('is-loading');
       const data = Object.fromEntries(new FormData(form).entries());
       data.origen = location.href;
       try {
-        if (FORM_ENDPOINT) {
+        if (hubspotReady()) {
+          await sendToHubspot(data);
+        } else if (FORM_ENDPOINT) {
           const res = await fetch(FORM_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -285,7 +394,9 @@
       } catch (err) {
         submit.disabled = false;
         submit.classList.remove('is-loading');
-        alert('No pudimos enviar tu registro. Inténtalo de nuevo o escríbenos por WhatsApp.');
+        showError(err && err.invalidInput
+          ? 'Revisa tus datos: ' + err.message
+          : 'No pudimos enviar tu registro. Inténtalo de nuevo o escríbenos por WhatsApp.');
       }
     });
   }

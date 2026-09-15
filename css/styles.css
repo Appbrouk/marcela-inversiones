@@ -452,6 +452,10 @@ button{font:inherit}
 .check input:checked~.check__box{background:var(--rose-400);border-color:var(--rose-500)}
 .check input:checked~.check__box path{stroke-dashoffset:0}
 .check input:focus-visible~.check__box{outline:2px solid var(--focus-ring);outline-offset:2px}
+.form__error{
+  margin-top:-4px;color:var(--negative);font-size:14px;line-height:1.45;
+  border-left:2px solid var(--negative);padding-left:12px;
+}
 .success{text-align:center;padding:24px 0}
 .success__icon{width:56px;height:56px;margin:0 auto 18px}
 .success__icon circle{fill:none;stroke:var(--rose-400);stroke-width:1.2;stroke-dasharray:1;stroke-dashoffset:1}
