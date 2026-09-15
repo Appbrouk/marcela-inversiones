@@ -1,0 +1,14 @@
+# Vercel
+.vercel
+
+# Dependencias / builds
+node_modules/
+dist/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Entorno
+.env
+.env.local

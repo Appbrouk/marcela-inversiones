@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Marcela Díaz Inversiones</title>
+  <meta name="description" content="Asesoría en inversiones inmobiliarias en Santiago de Chile. Te acompaño estratégicamente en cada etapa, con una asesoría personalizada y transparente.">
+  <meta name="theme-color" content="#FFF5F2">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Marcela Díaz Inversiones">
+  <meta property="og:description" content="Invierte en las mejores propiedades de Santiago. Agenda tu pre evaluación gratuita.">
+  <meta property="og:image" content="assets/marce-hero.jpeg">
+  <meta property="og:locale" content="es_CL">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<!-- Intro: dibujo del isotipo (guiño al video de marca) -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div>
+    <svg class="intro__mark" viewBox="0 0 200 160" aria-hidden="true">
+      <path class="p1" pathLength="1" d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/>
+      <path class="p2" pathLength="1" d="M99.5 77 L86.3 102.6" stroke="#C8A0A0"/>
+      <path class="p3" pathLength="1" d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/>
+    </svg>
+    <div class="intro__name">Marcela Díaz</div>
+    <div class="intro__sub">Inversiones</div>
+  </div>
+</div>
+
+<div class="progress" aria-hidden="true"></div>
+
+<!-- Navegación -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="#inicio" aria-label="Marcela Díaz Inversiones — Inicio">
+      <img src="assets/logo-lockup.png" alt="Marcela Díaz Inversiones" width="233" height="160">
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="#inicio" class="is-active">Inicio</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#sobre-mi">Sobre mí</a>
+      <a href="#registro">Regístrate</a>
+      <span class="nav__indicator" aria-hidden="true"></span>
+    </nav>
+    <a class="btn btn--sm nav__cta" href="#registro">Registrarse</a>
+    <button class="nav__burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Menú móvil -->
+<div class="menu" id="menu" aria-label="Menú">
+  <a href="#inicio" style="--i:0">Inicio</a>
+  <a href="#servicios" style="--i:1">Servicios</a>
+  <a href="#proyectos" style="--i:2">Proyectos</a>
+  <a href="#sobre-mi" style="--i:3">Sobre mí</a>
+  <a href="#registro" style="--i:4">Regístrate</a>
+  <a class="btn" href="#registro" style="--i:5">Registrarse</a>
+  <p class="menu__contact">Balmoral 309, Santiago · +56 9 8433 6430</p>
+</div>
+
+<main>
+
+  <!-- Hero -->
+  <section id="inicio" class="hero">
+    <div class="container hero__grid">
+      <div class="hero__copy" data-reveal="fade">
+        <div class="kicker">
+          <span class="kicker__line"></span>
+          <span>Inversiones inmobiliarias</span>
+          <span class="kicker__line"></span>
+        </div>
+        <h1 class="display display--xl" data-split>Invierte en las mejores propiedades de Santiago</h1>
+        <p class="lead" data-reveal style="--d:520">Te acompaño estratégicamente en cada etapa, con una asesoría personalizada y transparente. ¿Estás preparado para obtener beneficios exclusivos?</p>
+        <div class="hero__actions" data-reveal style="--d:680">
+          <a class="btn btn--lg" href="#servicios">Agendar</a>
+          <a class="btn btn--lg btn--outline" href="#registro">Registrarse</a>
+        </div>
+        <p class="hero__sign" data-reveal="fade" style="--d:880">Soy Marcela Díaz, fundadora de MD Invest.</p>
+      </div>
+      <div class="hero__media">
+        <div class="hero__glow" aria-hidden="true"></div>
+        <img class="hero__img" src="assets/marce-hero.jpeg" alt="Marcela Díaz" width="853" height="1280" data-reveal="scale" data-parallax="-0.06" data-pointer fetchpriority="high">
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true"><i></i><span>Desliza</span></div>
+  </section>
+
+  <!-- Franja CTA -->
+  <section class="strip bg-blush">
+    <div data-reveal>
+      <h2>¡Agenda tu asesoría gratuita hoy!</h2>
+      <p>Pre evaluación de inversión inmobiliaria · 30 min · Gratis</p>
+      <a class="btn btn--outline" href="https://wa.me/56984336430" target="_blank" rel="noopener">Conversemos</a>
+    </div>
+  </section>
+
+  <!-- Servicios -->
+  <section id="servicios" class="section bg-cream">
+    <div class="container">
+      <div class="section-title" data-reveal>
+        <div class="kicker kicker--rose">
+          <span class="kicker__line"></span><span>Reservas y Servicios</span><span class="kicker__line"></span>
+        </div>
+        <h2>Agenda con Marcela</h2>
+        <p>Asesoría personalizada y transparente, en cada etapa de tu inversión.</p>
+      </div>
+      <div class="grid grid--services" data-stagger>
+        <article class="card tilt" data-reveal>
+          <div class="card__badges">
+            <span class="badge badge--rose">30 min</span>
+            <span class="badge">Pre evaluación</span>
+          </div>
+          <h3>Inversión inmobiliaria</h3>
+          <p>Evaluamos tu perfil y capacidad de inversión, sin costo.</p>
+          <div class="card__foot">
+            <span class="card__price">Gratis</span>
+            <a class="btn btn--sm" href="#registro">Reservar ahora</a>
+          </div>
+        </article>
+        <article class="card tilt" data-reveal>
+          <div class="card__badges">
+            <span class="badge badge--rose">30 min</span>
+            <span class="badge">Pre evaluación</span>
+          </div>
+          <h3>Gestión de créditos</h3>
+          <p>Evaluamos tu situación crediticia y las mejores opciones de financiamiento.</p>
+          <div class="card__foot">
+            <span class="card__price">Gratis</span>
+            <a class="btn btn--sm" href="#registro">Reservar ahora</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- eBooks y guías -->
+  <section id="recursos" class="section bg-white">
+    <div class="container">
+      <div class="section-title" data-reveal>
+        <div class="kicker kicker--rose">
+          <span class="kicker__line"></span><span>Recursos</span><span class="kicker__line"></span>
+        </div>
+        <h2>eBooks y guías</h2>
+        <p>Deja tus datos y recibe el material directo en tu correo.</p>
+      </div>
+      <div class="grid grid--ebooks" data-stagger>
+        <article class="ebook" data-reveal>
+          <div class="ebook__media" aria-hidden="true">
+            <div class="book">
+              <div class="book__spine"></div>
+              <div class="book__pages"></div>
+              <div class="book__cover">
+                <div class="book__band">
+                  <svg viewBox="0 0 200 160" fill="none" stroke-width="12"><path d="M10 150 L74 10 L138 150" stroke="#fff"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#fff" opacity=".7"/></svg>
+                </div>
+                <div class="book__title">Aprende a invertir en departamentos paso a paso</div>
+                <div class="book__meta">MD Invest · eBook</div>
+              </div>
+            </div>
+          </div>
+          <div class="ebook__body">
+            <span class="badge">eBook</span>
+            <h3>Aprende a Invertir en Departamentos Paso a Paso</h3>
+            <p>Todo lo que necesitas para dar tu primer paso como inversionista.</p>
+            <a class="btn btn--sm" href="#registro">Obtener ahora</a>
+          </div>
+        </article>
+        <article class="ebook" data-reveal>
+          <div class="ebook__media" aria-hidden="true">
+            <div class="book book--gold">
+              <div class="book__spine"></div>
+              <div class="book__pages"></div>
+              <div class="book__cover">
+                <div class="book__band">
+                  <svg viewBox="0 0 200 160" fill="none" stroke-width="12"><path d="M10 150 L74 10 L138 150" stroke="#fff"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#fff" opacity=".7"/></svg>
+                </div>
+                <div class="book__title">Guía práctica para gestionar tu crédito</div>
+                <div class="book__meta">MD Invest · Guía</div>
+              </div>
+            </div>
+          </div>
+          <div class="ebook__body">
+            <span class="badge">Guía</span>
+            <h3>Guía Práctica Para Gestionar Tu Crédito</h3>
+            <p>Ordena tus finanzas y prepara tu crédito hipotecario.</p>
+            <a class="btn btn--sm" href="#registro">Obtener ahora</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Proyectos -->
+  <section id="proyectos" class="section bg-cream">
+    <div class="container">
+      <div class="section-title" data-reveal>
+        <div class="kicker kicker--rose">
+          <span class="kicker__line"></span><span>Proyectos</span><span class="kicker__line"></span>
+        </div>
+        <h2>Oportunidades de inversión</h2>
+        <p>Una selección de proyectos con potencial de renta en Santiago. Regístrate para conocer los detalles.</p>
+      </div>
+      <div class="grid grid--projects" data-stagger>
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <!-- Reemplazar por <img src="assets/proyecto-1.jpg" alt="…"> cuando exista la foto -->
+            <div class="ph ph--1" role="img" aria-label="Foto del proyecto 1">
+              <svg class="ph__mark" viewBox="0 0 200 160" fill="none" stroke-width="10"><path d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/></svg>
+              <span class="ph__num">01</span>
+              <span class="ph__label">Ñuñoa</span>
+            </div>
+          </div>
+          <div class="project__body">
+            <span class="badge">Ñuñoa</span>
+            <h3>Proyecto 1</h3>
+            <div class="project__foot">
+              <span>Desde 2.900 UF</span>
+              <a class="btn btn--ghost btn--sm" href="#registro">Ver detalles</a>
+            </div>
+          </div>
+        </article>
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="ph ph--2" role="img" aria-label="Foto del proyecto 2">
+              <svg class="ph__mark" viewBox="0 0 200 160" fill="none" stroke-width="10"><path d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/></svg>
+              <span class="ph__num">02</span>
+              <span class="ph__label">Santiago Centro</span>
+            </div>
+          </div>
+          <div class="project__body">
+            <span class="badge">Santiago Centro</span>
+            <h3>Proyecto 2</h3>
+            <div class="project__foot">
+              <span>Desde 2.400 UF</span>
+              <a class="btn btn--ghost btn--sm" href="#registro">Ver detalles</a>
+            </div>
+          </div>
+        </article>
+        <article class="project" data-reveal>
+          <div class="project__media">
+            <div class="ph ph--3" role="img" aria-label="Foto del proyecto 3">
+              <svg class="ph__mark" viewBox="0 0 200 160" fill="none" stroke-width="10"><path d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/></svg>
+              <span class="ph__num">03</span>
+              <span class="ph__label">La Florida</span>
+            </div>
+          </div>
+          <div class="project__body">
+            <span class="badge">La Florida</span>
+            <h3>Proyecto 3</h3>
+            <div class="project__foot">
+              <span>Desde 2.100 UF</span>
+              <a class="btn btn--ghost btn--sm" href="#registro">Ver detalles</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sobre mí -->
+  <section id="sobre-mi" class="section bg-white">
+    <div class="container about">
+      <div class="frame" data-reveal="left">
+        <div class="frame__clip">
+          <img src="assets/marce-rosa.jpeg" alt="Marcela Díaz, fundadora de MD Invest" width="1024" height="1280" loading="lazy" data-parallax="0.08">
+        </div>
+      </div>
+      <div class="about__copy" data-reveal="right" style="position:relative">
+        <svg class="about__mark" viewBox="0 0 200 160" fill="none" stroke-width="9" aria-hidden="true"><path d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/><path d="M99.5 77 L86.3 102.6" stroke="#C8A0A0"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/></svg>
+        <div class="kicker">
+          <span class="kicker__line"></span><span>Sobre mí</span><span class="kicker__line"></span>
+        </div>
+        <h2 class="display display--lg">Asesoría experta en inversiones inmobiliarias</h2>
+        <p>Soy Marcela Díaz, fundadora de MD Invest y asesora en inversiones inmobiliarias. Mi misión es guiarte hacia una inversión exitosa con una asesoría personalizada y transparente.</p>
+        <p>En MD Invest, no solo vendemos propiedades; te acompañamos estratégicamente hacia el éxito financiero en bienes raíces.</p>
+        <p class="muted">¿Listo para invertir? Permíteme asesorarte.</p>
+        <div class="about__actions">
+          <a class="btn" href="#servicios">Agendar</a>
+          <a class="btn btn--ghost" href="#registro">Registrarse</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Registro -->
+  <section id="registro" class="section bg-blush">
+    <div class="container register">
+      <div class="register__copy" data-reveal>
+        <div class="kicker kicker--ink">
+          <span class="kicker__line"></span><span style="color:var(--gold-500)">Regístrate</span><span class="kicker__line"></span>
+        </div>
+        <h2 class="display display--lg">Recibe oportunidades de inversión</h2>
+        <p>Déjame tus datos y te enviaré oportunidades exclusivas, novedades del mercado y fechas disponibles para agendar tu asesoría.</p>
+      </div>
+      <div class="panel" data-reveal="scale" style="--d:120">
+        <form class="form" id="form-registro" novalidate>
+          <label class="field">
+            <span class="field__label">Nombre</span>
+            <span class="field__control"><input type="text" name="nombre" placeholder="Tu nombre" autocomplete="name" required></span>
+          </label>
+          <label class="field">
+            <span class="field__label">Email</span>
+            <span class="field__control"><input type="email" name="email" placeholder="tu@email.cl" autocomplete="email" required></span>
+          </label>
+          <label class="field">
+            <span class="field__label">Teléfono</span>
+            <span class="field__control"><input type="tel" name="telefono" placeholder="+56 9 …" autocomplete="tel" inputmode="tel"></span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="acepta" name="acepta" value="si">
+            <span class="check__box" aria-hidden="true"><svg viewBox="0 0 10 8"><path pathLength="1" d="M1 4l2.5 2.5L9 1"/></svg></span>
+            <span>Acepto recibir información de MD Invest</span>
+          </label>
+          <button class="btn btn--block" type="submit" disabled>Registrarse</button>
+        </form>
+        <div class="success" id="registro-ok" hidden role="status">
+          <svg class="success__icon" viewBox="0 0 56 56" aria-hidden="true">
+            <circle pathLength="1" cx="28" cy="28" r="26"/>
+            <path pathLength="1" d="M18 29l7 7 14-16"/>
+          </svg>
+          <h3>¡Registro enviado!</h3>
+          <p>Marcela te contactará muy pronto. Gracias por tu confianza.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA final -->
+  <section class="final bg-white">
+    <div class="container final__grid">
+      <div class="final__copy" data-reveal>
+        <h2 class="display display--md">¿Listo para invertir?</h2>
+        <p>Permíteme asesorarte. Agenda tu pre evaluación gratuita y da el primer paso con total confianza.</p>
+        <div class="final__actions">
+          <a class="btn btn--lg" href="https://wa.me/56984336430" target="_blank" rel="noopener">Agendar</a>
+          <a class="btn btn--lg btn--ghost" href="#registro">Registrarse</a>
+        </div>
+      </div>
+      <img class="final__img" src="assets/marce-llamada.jpeg" alt="Marcela Díaz atendiendo una llamada" width="853" height="1280" loading="lazy" data-reveal="scale" data-parallax="-0.05">
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer__grid">
+    <div>
+      <img class="footer__logo" src="assets/logo-wordmark.png" alt="Marcela Díaz Inversiones" width="828" height="200" loading="lazy">
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <div class="footer__col">Santiago Región Metropolitana<br>Balmoral 309<br><a href="tel:+56984336430">+56 9 8433 6430</a></div>
+    </div>
+    <div>
+      <h4>Enlaces rápidos</h4>
+      <div class="footer__col"><a href="#">Términos y condiciones</a><br><a href="#">Política de privacidad</a></div>
+    </div>
+    <div>
+      <h4>Redes sociales</h4>
+      <div class="footer__col">
+        <a href="https://www.instagram.com/marceladiazinversiones/" target="_blank" rel="noopener">Instagram</a><br>
+        <a href="https://www.tiktok.com/@mdinvest.cl" target="_blank" rel="noopener">TikTok</a><br>
+        <a href="#">LinkedIn</a><br>
+        <a href="#">Facebook</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <span>© <span id="year">2026</span> Marcela Díaz Inversiones</span>
+    <span>Balmoral 309, Santiago RM</span>
+  </div>
+</footer>
+
+<button class="to-top" id="to-top" type="button" aria-label="Volver arriba">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg>
+</button>
+
+<script src="js/main.js" defer></script>
+
+</body>
+</html>
