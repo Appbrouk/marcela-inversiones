@@ -248,11 +248,18 @@ button{font:inherit}
 }
 .js .card[data-reveal]{transition-duration:1s,1s,1s,.35s,.6s}
 .js .ebook[data-reveal],.js .project[data-reveal]{transition-duration:1s,1s,1s,.6s,.6s}
+/* Las imágenes con parallax reciben su `transform` ya suavizado desde JS
+   (interpolación por frame), así que aquí no lleva transición: poner una
+   duración sobre un valor que cambia en cada frame solo lo hace arrastrarse.
+   El reveal además se queda corto y discreto para que no compita con el scroll. */
 .js .hero__img[data-reveal],.js .final__img[data-reveal]{
-  transition-duration:1.2s,1.2s,1.2s,.15s,0s;
-  transition-timing-function:var(--ease-out),var(--ease-out),var(--ease-out),linear,linear;
-  transition-delay:.2s,.2s,.2s,0s,0s;
+  transition-duration:.9s,.9s,.9s,0s,0s;
+  transition-delay:.1s,.1s,.1s,0s,0s;
 }
+/* El punto de partida va en :not(.in): si no, esta regla empata en
+   especificidad con `.js [data-reveal].in`, gana por ir después y la imagen
+   se queda para siempre en su posición previa al reveal. */
+.js .hero__img[data-reveal]:not(.in),.js .final__img[data-reveal]:not(.in){translate:0 14px;scale:.99}
 
 /* Palabras enmascaradas del titular (data-split) */
 .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.12em;margin-bottom:-.12em}
@@ -281,7 +288,7 @@ button{font:inherit}
 .hero__img{
   position:relative;z-index:1;width:100%;max-height:620px;object-fit:contain;object-position:bottom;
   transform:translate3d(var(--px,0),var(--py,0),0) rotate(var(--rot,0deg));
-  transition:transform .15s linear;
+  will-change:transform;
 }
 /* (la transición combinada reveal + parallax vive en el bloque de reveals) */
 .hero__scroll{
@@ -314,7 +321,8 @@ button{font:inherit}
 
 /* ---------- Card (Card del DS) + inclinación 3D ---------- */
 .card{
-  position:relative;background:var(--surface-card);border:1px solid var(--border-hairline);padding:32px;
+  position:relative;display:flex;flex-direction:column;height:100%;
+  background:var(--surface-card);border:1px solid var(--border-hairline);padding:32px;
   box-shadow:none;transition:box-shadow .6s var(--ease-out),transform .6s var(--ease-out);
 }
 .card:hover{box-shadow:var(--shadow-lift)}
@@ -333,7 +341,7 @@ button{font:inherit}
 .card__badges{display:flex;gap:8px}
 .card h3{margin-top:16px;font-size:20px;font-weight:500;letter-spacing:.04em}
 .card p{margin-top:10px;font-size:14px;color:var(--ink-500);line-height:1.55}
-.card__foot{display:flex;align-items:center;justify-content:space-between;margin-top:24px;gap:12px}
+.card__foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:24px;gap:12px}
 .card__price{font-size:16px;color:var(--ink-900)}
 
 /* ---------- eBooks ---------- */
@@ -408,7 +416,7 @@ button{font:inherit}
   transform:translate3d(calc(var(--py,0px) * -.35),calc(var(--py,0px) * .35),0);
 }
 .frame__clip{overflow:hidden}
-.frame img{width:100%;object-fit:cover;transform:translate3d(0,var(--py,0),0) scale(1.08);transition:transform .15s linear}
+.frame img{width:100%;object-fit:cover;transform:translate3d(0,var(--py,0),0) scale(1.08);will-change:transform}
 .about__copy .kicker{margin-bottom:24px}
 .about__copy .kicker .kicker__line:last-child{display:none}
 .about__copy p{margin-top:16px;font-size:16px;line-height:1.55}
@@ -474,7 +482,7 @@ button{font:inherit}
 .final__copy{padding-bottom:72px;align-self:center}
 .final__copy p{margin-top:18px;color:var(--ink-500);max-width:420px}
 .final__actions{display:flex;gap:16px;margin-top:32px;flex-wrap:wrap}
-.final__img{width:340px;max-width:100%;object-fit:contain;transform:translate3d(0,var(--py,0),0);transition:transform .15s linear}
+.final__img{width:340px;max-width:100%;object-fit:contain;transform:translate3d(0,var(--py,0),0);will-change:transform}
 
 /* ---------- Footer (Footer del DS) ---------- */
 .footer{background:var(--surface-cream);padding:56px var(--gutter) 32px}

@@ -22,8 +22,8 @@
      Mientras `portalId` o `formGuid` estén vacíos, el sitio sigue en modo demo
      (valida y muestra el éxito sin enviar nada). */
   const HUBSPOT = {
-    portalId: '',
-    formGuid: '',
+    portalId: '51801072',
+    formGuid: 'a8d33577-b4ec-4884-a984-08a08e1fe5e0',
     /* Región del portal: 'na1' (por defecto), 'eu1', etc. Aparece en la URL de HubSpot. */
     region: 'na1',
     /* Solo si el formulario tiene activado el consentimiento (RGPD) en HubSpot.
@@ -124,23 +124,96 @@
   }
   if (!playIntro) startReveals();
 
-  /* ---------- Nav: vidrio al hacer scroll · progreso · parallax ---------- */
+  /* ---------- Nav: vidrio al hacer scroll · progreso ---------- */
   const nav = d.getElementById('nav');
   const progress = d.querySelector('.progress');
   const toTop = d.getElementById('to-top');
-  const parallaxEls = reduced ? [] : [...d.querySelectorAll('[data-parallax]')];
 
-  const updateParallax = () => {
-    const vh = innerHeight;
-    parallaxEls.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 200) return;
-      const speed = parseFloat(el.dataset.parallax) || 0;
-      const center = r.top + r.height / 2 - vh / 2;
-      el.style.setProperty('--py', (center * speed).toFixed(1) + 'px');
-      const frame = el.closest('.frame');
-      if (frame) frame.style.setProperty('--py', (center * speed).toFixed(1) + 'px');
+  /* ---------- Movimiento de las imágenes ligado al scroll ----------
+     El scroll solo fija un objetivo; un bucle de rAF acerca cada imagen a ese
+     objetivo una fracción del camino por frame. Así el movimiento tiene inercia
+     propia — arranca y frena suave — y se mantiene continuo aunque los eventos
+     de scroll lleguen con huecos (rueda, inercia táctil, barra arrastrada).
+
+     Antes el valor se escribía tal cual en cada evento y se suavizaba con una
+     transición CSS de .15s: cada evento reiniciaba la transición, así que la
+     imagen nunca llegaba a su sitio y se veía arrastrada y a saltos.
+
+     El bucle se apaga solo cuando todo llegó a su destino, para no gastar frames
+     con la página quieta. */
+  const EASE = 0.11;   // fracción del camino que se recorre por frame
+  const STOP = 0.05;   // px: por debajo de esto damos el movimiento por terminado
+
+  const parallax = reduced ? [] : [...d.querySelectorAll('[data-parallax]')].map((el) => ({
+    el,
+    frame: el.closest('.frame'),
+    speed: parseFloat(el.dataset.parallax) || 0,
+    current: 0, target: 0, painted: '',
+  }));
+
+  const pointer = { el: null, x: 0, rot: 0, tx: 0, trot: 0, painted: '' };
+
+  /* Avance del elemento por el viewport: -1 al entrar por abajo, 0 centrado,
+     1 al salir por arriba. Normalizarlo con la altura de la ventana hace que el
+     recorrido se sienta igual en un móvil que en una pantalla grande. */
+  const measure = (snap) => {
+    const vh = innerHeight || 1;
+    parallax.forEach((p) => {
+      const r = p.el.getBoundingClientRect();
+      const advance = (r.top + r.height / 2 - vh / 2) / vh;
+      p.target = Math.max(-1.25, Math.min(1.25, advance)) * p.speed * vh * 0.7;
+      /* Fuera de vista no hay nada que suavizar: dejamos el valor final puesto
+         para que el elemento no aparezca persiguiendo su posición. */
+      if (snap || r.bottom < -vh * 0.4 || r.top > vh * 1.4) p.current = p.target;
     });
+  };
+
+  const paint = () => {
+    let moving = false;
+    parallax.forEach((p) => {
+      const diff = p.target - p.current;
+      if (Math.abs(diff) > STOP) { p.current += diff * EASE; moving = true; }
+      else p.current = p.target;
+      const v = p.current.toFixed(2) + 'px';
+      if (v === p.painted) return;
+      p.painted = v;
+      p.el.style.setProperty('--py', v);
+      if (p.frame) p.frame.style.setProperty('--py', v);
+    });
+    if (pointer.el) {
+      const dx = pointer.tx - pointer.x;
+      const drot = pointer.trot - pointer.rot;
+      if (Math.abs(dx) > STOP || Math.abs(drot) > 0.01) {
+        pointer.x += dx * EASE;
+        pointer.rot += drot * EASE;
+        moving = true;
+      } else {
+        pointer.x = pointer.tx;
+        pointer.rot = pointer.trot;
+      }
+      const v = pointer.x.toFixed(2) + '|' + pointer.rot.toFixed(3);
+      if (v !== pointer.painted) {
+        pointer.painted = v;
+        pointer.el.style.setProperty('--px', pointer.x.toFixed(2) + 'px');
+        pointer.el.style.setProperty('--rot', pointer.rot.toFixed(3) + 'deg');
+      }
+    }
+    return moving;
+  };
+
+  let motionRaf = 0;
+  let idleFrames = 0;
+  const loop = () => {
+    /* Unos frames de gracia antes de apagar el bucle: el scroll por inercia
+       entrega eventos con pausas y no queremos reiniciarlo en cada una. */
+    if (paint()) idleFrames = 0;
+    else if (++idleFrames > 6) { motionRaf = 0; return; }
+    motionRaf = requestAnimationFrame(loop);
+  };
+  const startLoop = () => {
+    if (motionRaf) return;
+    idleFrames = 0;
+    motionRaf = requestAnimationFrame(loop);
   };
 
   let ticking = false;
@@ -153,35 +226,38 @@
       const max = root.scrollHeight - innerHeight;
       if (progress) progress.style.setProperty('--p', max > 0 ? Math.min(1, y / max).toFixed(4) : 0);
       if (toTop) toTop.classList.toggle('is-visible', y > innerHeight * 0.9);
-      updateParallax();
+      measure(false);
+      startLoop();
       sweepReveals();
       ticking = false;
     });
   };
   addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', onScroll);
+  addEventListener('resize', () => { measure(true); paint(); onScroll(); });
+  measure(true);
+  paint();
   onScroll();
 
   if (toTop) toTop.addEventListener('click', () => scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
 
-  /* ---------- Hero: parallax de puntero (profundidad sutil) ---------- */
+  /* ---------- Hero: parallax de puntero (profundidad sutil) ----------
+     Comparte bucle e interpolación con el parallax de scroll, así el retrato
+     acompaña al cursor con algo de retraso elástico en vez de pegarse a él. */
   if (finePointer && !reduced) {
     const hero = d.querySelector('.hero');
     const img = d.querySelector('[data-pointer]');
     if (hero && img) {
-      let raf;
+      pointer.el = img;
       hero.addEventListener('pointermove', (e) => {
         const x = e.clientX / innerWidth - 0.5;
-        const y = e.clientY / innerHeight - 0.5;
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => {
-          img.style.setProperty('--px', (x * -14).toFixed(1) + 'px');
-          img.style.setProperty('--rot', (x * 0.6).toFixed(2) + 'deg');
-        });
+        pointer.tx = x * -14;
+        pointer.trot = x * 0.6;
+        startLoop();
       });
       hero.addEventListener('pointerleave', () => {
-        img.style.setProperty('--px', '0px');
-        img.style.setProperty('--rot', '0deg');
+        pointer.tx = 0;
+        pointer.trot = 0;
+        startLoop();
       });
     }
   }

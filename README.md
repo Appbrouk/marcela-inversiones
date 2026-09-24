@@ -73,22 +73,23 @@ Si necesitas la separación exacta, conviene dividir el campo en el HTML.
 
 ### 2. Pegar los identificadores
 
-En `js/main.js`, al inicio:
+Ya están puestos en `js/main.js`, al inicio:
 
 ```js
 const HUBSPOT = {
-  portalId: '',            // tu Hub ID
-  formGuid: '',            // el ID del formulario
-  region: 'na1',           // 'eu1' si tu portal es europeo
-  subscriptionTypeId: 0,   // ver punto 3
+  portalId: '51801072',                              // Hub ID
+  formGuid: 'a8d33577-b4ec-4884-a984-08a08e1fe5e0',  // ID del formulario
+  region: 'na1',                                     // 'eu1' si el portal fuera europeo
+  subscriptionTypeId: 0,                             // ver punto 3
 };
 ```
 
 Ambos valores están en **Compartir / Insertar** del formulario, dentro del
-fragmento de código (`portalId` y `formId`).
+fragmento de código (`portalId` y `formId`). Para apuntar a otro formulario, basta
+con reemplazarlos aquí.
 
-Mientras estén vacíos el sitio queda en **modo demo**: valida y muestra el mensaje
-de éxito sin enviar nada.
+Si se dejan vacíos el sitio vuelve a **modo demo**: valida y muestra el mensaje de
+éxito sin enviar nada.
 
 ### 3. Consentimiento (RGPD)
 
@@ -98,14 +99,15 @@ Pon en `subscriptionTypeId` el ID del tipo de suscripción y el checkbox
 Si lo dejas en `0` no se envía el bloque de consentimiento — que es lo correcto
 cuando el formulario de HubSpot no lo pide, porque enviarlo de más da error.
 
-### 4. Atribución de origen (opcional)
+### 4. Atribución de origen
 
-Para que HubSpot registre de dónde viene cada contacto, descomenta el script de
-seguimiento al final de `index.html` y reemplaza `NNNNNNN` por tu Hub ID. El sitio
-lee la cookie `hubspotutk` y la adjunta como `context.hutk`.
+El script de seguimiento (`js.hs-scripts.com/51801072.js`) está **activo** al final
+de `index.html`: deja la cookie `hubspotutk` y el sitio la adjunta como
+`context.hutk`, para que HubSpot registre de dónde viene cada contacto.
 
-Instala cookies en el navegador de quien visita: revisa tu política de privacidad
-antes de activarlo. Sin el script el contacto se crea igual, solo que sin atribución.
+Instala cookies en el navegador de quien visita: revisa tu política de privacidad.
+Si prefieres no usarlo, comenta esa línea; el contacto se crea igual, solo que sin
+atribución.
 
 ### Errores
 
@@ -121,8 +123,9 @@ Si prefieres otro destino, deja `HUBSPOT` vacío y define `FORM_ENDPOINT` en
 
 ## Pendientes conocidos
 
-- **Pegar `portalId` y `formGuid` de HubSpot** en `js/main.js`. Hasta entonces el
-  formulario no envía nada: muestra el éxito en modo demo y los registros se pierden.
+- **Enviar un registro de prueba** y confirmar que llega a HubSpot. La Forms API
+  rechaza los campos que no existan en el formulario, así que el formulario del
+  portal debe incluir `firstname`, `lastname`, `email` y `phone`.
 - Los proyectos 1, 2 y 3 usan placeholders. Reemplaza el `<div class="ph …">` de
   cada tarjeta por `<img src="assets/proyecto-N.jpg" alt="…">` cuando existan las fotos.
 - Los enlaces de *Términos y condiciones*, *Política de privacidad*, LinkedIn y
