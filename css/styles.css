@@ -507,6 +507,196 @@ button{font:inherit}
 .to-top:hover{background:#fff}
 .to-top svg{width:16px;height:16px}
 
+/* ---------- Carrusel de proyectos ----------
+   Pista horizontal con scroll-snap: en táctil se desliza con el dedo, en escritorio
+   se arrastra con el mouse o se usan las flechas. La pista "sangra" hasta el borde
+   del viewport para que la siguiente tarjeta asome y se entienda que hay más. */
+.carousel{position:relative;margin-top:56px}
+.carousel__track{
+  --card-w:clamp(280px,74vw,400px);
+  --bleed:var(--gutter); /* JS lo ajusta a la distancia real hasta el borde del viewport */
+  position:relative;display:flex;gap:24px;
+  margin:-12px calc(-1*var(--bleed)) 0;
+  padding:12px var(--bleed) 56px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-padding-left:var(--bleed);scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  cursor:grab;user-select:none;-webkit-user-select:none;
+}
+.carousel__track::-webkit-scrollbar{display:none}
+.carousel__track:focus-visible{outline:none}
+.carousel__track:focus-visible .project.is-current{outline:2px solid var(--focus-ring);outline-offset:3px}
+.carousel__track.is-dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
+.carousel__track.is-jumping{scroll-behavior:auto}
+/* Copias para el bucle: visibles siempre, sin animación de entrada */
+.js .project.is-clone[data-reveal],.js .project.is-clone{opacity:1;translate:none;scale:none}
+.carousel__track.is-dragging .project{pointer-events:none}
+.carousel__track>.project{flex:0 0 var(--card-w);width:var(--card-w);scroll-snap-align:start}
+
+.carousel__bar{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  margin-top:-24px;padding-top:20px;border-top:1px solid var(--border-hairline);
+}
+.carousel__meta{display:flex;align-items:center;gap:20px;min-width:0}
+.carousel__count{font-size:11px;font-weight:500;letter-spacing:.28em;color:var(--ink-500);white-space:nowrap;font-variant-numeric:tabular-nums}
+.carousel__dots{display:flex;align-items:center;gap:8px}
+.carousel__dots button{
+  width:22px;height:14px;padding:0;border:0;background:transparent;cursor:pointer;position:relative;
+}
+.carousel__dots button::before{
+  content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--ink-150);
+  transition:background .4s var(--ease-out),transform .6s var(--ease-out);transform-origin:left center;
+}
+.carousel__dots button:hover::before{background:var(--rose-300)}
+.carousel__dots button.is-active{width:40px}
+.carousel__dots button.is-active::before{background:var(--rose-400)}
+.carousel__nav{display:flex;gap:10px}
+.carousel__btn{
+  width:44px;height:44px;display:grid;place-items:center;padding:0;
+  background:rgba(255,255,255,.8);border:1px solid var(--border-hairline);border-radius:var(--radius-xs);
+  color:var(--ink-900);cursor:pointer;
+  transition:background .3s,border-color .3s,color .3s,opacity .3s,transform .5s var(--ease-out);
+}
+.carousel__btn svg{width:16px;height:16px}
+.carousel__btn:hover{background:#fff;border-color:var(--rose-400);color:var(--rose-600)}
+.carousel__btn:active{transform:scale(.94)}
+.carousel__btn[disabled]{opacity:.3;cursor:default;pointer-events:none}
+.carousel__noscript{margin-top:24px;font-size:14px;color:var(--ink-500);text-align:center}
+
+/* Tarjeta: complementa .project (ver arriba) */
+.project{display:flex;flex-direction:column}
+.project__media img{width:100%;height:100%;object-fit:cover}
+.project__media .ph{height:100%}
+.project__media>.project__index{transform:none!important}
+.project__index{
+  position:absolute;left:16px;top:14px;z-index:1;
+  font-size:10px;font-weight:500;letter-spacing:.28em;color:var(--ink-700);line-height:1;
+  padding:6px 10px 5px;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  transition:none!important;
+}
+.project__body{display:flex;flex-direction:column;flex:1}
+.project__badges{display:flex;gap:8px;flex-wrap:wrap}
+.project__dev{margin-top:6px;font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-600)}
+.project__excerpt{
+  margin-top:10px;font-size:14px;color:var(--ink-500);line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.project__foot{margin-top:auto;padding-top:18px}
+.project__foot .btn{cursor:pointer}
+
+/* ---------- Modal de proyecto ----------
+   <dialog> nativo: capa superior, foco atrapado y Escape gratis. La animación de
+   entrada la dispara la clase .is-open desde JS; la de salida se espera antes
+   de cerrar. */
+.modal{
+  --modal-h:min(92vh,860px);
+  position:fixed;inset:0;margin:auto;padding:0;
+  width:min(1040px,calc(100% - 32px));max-width:none;height:fit-content;max-height:var(--modal-h);
+  border:1px solid var(--border-hairline);background:#fff;color:var(--text-body);
+  box-shadow:var(--shadow-lift);overflow:visible;
+  opacity:0;translate:0 24px;scale:.985;
+  transition:opacity .45s var(--ease-out),translate .6s var(--ease-out),scale .6s var(--ease-out);
+}
+.modal.is-open{opacity:1;translate:none;scale:none}
+.modal::backdrop{
+  background:rgba(25,24,23,.5);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  opacity:0;transition:opacity .45s var(--ease-out);
+}
+.modal.is-open::backdrop{opacity:1}
+.modal:not([open]){display:none}
+html.modal-open{overflow:hidden}
+
+.modal__inner{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);
+  max-height:var(--modal-h);
+}
+.modal__close{
+  position:absolute;right:16px;top:16px;z-index:3;width:44px;height:44px;display:grid;place-items:center;padding:0;
+  background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid var(--border-hairline);border-radius:var(--radius-xs);color:var(--ink-900);cursor:pointer;
+  transition:background .3s,border-color .3s,color .3s,transform .5s var(--ease-out);
+}
+.modal__close svg{width:16px;height:16px}
+.modal__close:hover{background:#fff;border-color:var(--rose-400);color:var(--rose-600);transform:rotate(90deg)}
+
+.modal__body{
+  padding:48px 44px 40px;overflow-y:auto;min-height:min(560px,calc(var(--modal-h) - 2px));
+  display:flex;flex-direction:column;
+}
+.modal__badges{display:flex;gap:8px;flex-wrap:wrap}
+.modal__title{margin-top:18px;font-size:clamp(22px,2.4vw,28px);font-weight:300;letter-spacing:.14em;text-transform:uppercase;line-height:1.25}
+.modal__dev{margin-top:8px;font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-600)}
+.modal__price{margin-top:10px;font-size:15px;color:var(--gold-600);letter-spacing:.06em}
+.modal__desc{margin-top:22px;font-size:15px;line-height:1.65;color:var(--ink-700)}
+.modal__desc p+p{margin-top:12px}
+.modal__data{margin:26px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:0 24px;border-top:1px solid var(--border-hairline)}
+.modal__data>div{padding:12px 0;border-bottom:1px solid var(--border-hairline)}
+.modal__data dt{font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-300)}
+.modal__data dd{margin:6px 0 0;font-size:14px;color:var(--ink-900)}
+.modal__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:auto;padding-top:32px}
+.modal__actions .btn--ghost{margin-left:auto}
+
+/* Galería del modal */
+.gallery{position:relative;background:var(--cream-100);min-height:320px;overflow:hidden}
+.gallery__track{
+  position:absolute;inset:0;display:flex;
+  overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.gallery__track::-webkit-scrollbar{display:none}
+.gallery__item{flex:0 0 100%;width:100%;height:100%;margin:0;scroll-snap-align:start}
+.gallery__item img{width:100%;height:100%;object-fit:cover}
+.gallery__item.ph{position:relative;display:grid}
+.gallery__btn{
+  position:absolute;top:50%;translate:0 -50%;z-index:2;width:44px;height:44px;display:grid;place-items:center;padding:0;
+  background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.6);border-radius:var(--radius-xs);color:var(--ink-900);cursor:pointer;
+  transition:background .3s,color .3s,opacity .3s;
+}
+.gallery__btn svg{width:16px;height:16px}
+.gallery__btn:hover{background:#fff;color:var(--rose-600)}
+.gallery__btn--prev{left:16px}
+.gallery__btn--next{right:16px}
+.gallery__btn[disabled]{opacity:.3;pointer-events:none}
+.gallery__foot{
+  position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 16px;pointer-events:none;
+  background:linear-gradient(to top,rgba(25,24,23,.45),transparent);
+}
+.gallery__count{font-size:11px;font-weight:500;letter-spacing:.28em;color:#fff;font-variant-numeric:tabular-nums}
+.gallery__thumbs{display:flex;gap:6px;pointer-events:auto}
+.gallery__thumbs button{
+  width:48px;height:36px;padding:0;border:1px solid rgba(255,255,255,.5);background:var(--cream-100);cursor:pointer;overflow:hidden;
+  opacity:.65;transition:opacity .3s,border-color .3s;
+}
+.gallery__thumbs button img{width:100%;height:100%;object-fit:cover}
+.gallery__thumbs button:hover,.gallery__thumbs button.is-active{opacity:1;border-color:#fff}
+.gallery.is-single .gallery__btn,.gallery.is-single .gallery__foot{display:none}
+
+@media (max-width:760px){
+  .modal{--modal-h:100vh;--modal-h:100dvh;width:100%;max-height:none;height:100%;border:0;translate:0 32px}
+  .modal__inner{display:block;height:100%;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .modal__close{position:fixed}
+  .gallery{aspect-ratio:4/3;min-height:0}
+  .modal__body{padding:28px 24px 40px;min-height:0;overflow:visible}
+  .modal__data{grid-template-columns:1fr}
+  .modal__actions{padding-top:28px}
+  .modal__actions .btn{flex:1 1 auto}
+  .modal__actions .btn--ghost{margin-left:0;flex-basis:100%}
+}
+@media (max-width:560px){
+  .carousel{margin-top:40px}
+  .carousel__track{--card-w:min(300px,82vw)}
+  .carousel__bar{flex-wrap:wrap}
+  .carousel__dots{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .carousel__track,.gallery__track{scroll-behavior:auto}
+  .modal{opacity:1;translate:none;scale:none}
+  .modal::backdrop{opacity:1}
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width:1024px){
   .nav__links{gap:22px}

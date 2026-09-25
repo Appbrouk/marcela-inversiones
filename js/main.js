@@ -36,6 +36,394 @@
      no está configurado. */
   const FORM_ENDPOINT = '';
 
+  /* ---------- Proyectos: carrusel + modal ----------
+     Los datos viven en js/projects.js (window.MD_PROJECTS). Aquí solo se dibujan:
+     las tarjetas del carrusel y, al pedir detalles, el contenido del <dialog>.
+     Va antes del intro/reveals para que las tarjetas ya existan cuando se
+     recolectan los [data-reveal]. */
+  const PROJECTS = Array.isArray(window.MD_PROJECTS) ? window.MD_PROJECTS : [];
+  const track = d.getElementById('proyectos-track');
+  const carousel = d.getElementById('proyectos-carousel');
+  const dialog = d.getElementById('proyecto-modal');
+  const WHATSAPP = '56951497482';
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+  const PH_MARK = '<svg class="ph__mark" viewBox="0 0 200 160" fill="none" stroke-width="10" aria-hidden="true">'
+    + '<path d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/></svg>';
+  const placeholder = (p, i, extra) => (
+    '<div class="ph ph--' + ((i % 3) + 1) + ' ' + (extra || '') + '" role="img" aria-label="' + esc(p.nombre) + '">'
+    + PH_MARK + '<span class="ph__num">' + pad2(i + 1) + '</span><span class="ph__label">' + esc(p.comuna) + '</span></div>'
+  );
+  const paragraphs = (t) => (Array.isArray(t) ? t : [t]).filter(Boolean);
+
+  const projectCard = (p, i) => {
+    const cover = p.fotos && p.fotos[0];
+    const media = cover
+      ? '<img src="' + esc(cover.src) + '" alt="' + esc(cover.alt || p.nombre) + '" loading="' + (i < 2 ? 'eager' : 'lazy') + '" decoding="async">'
+      : placeholder(p, i);
+    const tag = p.etiqueta ? '<span class="badge badge--rose">' + esc(p.etiqueta) + '</span>' : '';
+    const excerpt = p.resumen || paragraphs(p.descripcion)[0] || '';
+    return '<article class="project" role="listitem" data-reveal data-id="' + esc(p.id) + '" style="--d:' + Math.min(i, 3) * 110 + '">'
+      + '<div class="project__media">' + media + '<span class="project__index" aria-hidden="true">' + pad2(i + 1) + '</span></div>'
+      + '<div class="project__body">'
+      + '<div class="project__badges"><span class="badge">' + esc(p.comuna) + '</span>' + tag + '</div>'
+      + '<h3>' + esc(p.nombre) + '</h3>'
+      + (p.inmobiliaria ? '<p class="project__dev">' + esc(p.inmobiliaria) + '</p>' : '')
+      + (excerpt ? '<p class="project__excerpt">' + esc(excerpt) + '</p>' : '')
+      + '<div class="project__foot"><span>' + esc(p.desde) + '</span>'
+      + '<button class="btn btn--ghost btn--sm" type="button" data-open="' + esc(p.id) + '" aria-haspopup="dialog">Ver detalles</button>'
+      + '</div></div></article>';
+  };
+
+  /* --- Modal --- */
+  const modal = dialog && {
+    wrap: d.getElementById('modal-gallery-wrap'),
+    gallery: d.getElementById('modal-gallery'),
+    thumbs: d.getElementById('modal-thumbs'),
+    count: d.getElementById('modal-count'),
+    gprev: dialog.querySelector('[data-gdir="-1"]'),
+    gnext: dialog.querySelector('[data-gdir="1"]'),
+    comuna: d.getElementById('modal-comuna'),
+    tag: d.getElementById('modal-tag'),
+    title: d.getElementById('modal-title'),
+    price: d.getElementById('modal-price'),
+    dev: d.getElementById('modal-dev'),
+    desc: d.getElementById('modal-desc'),
+    data: d.getElementById('modal-data'),
+    link: d.getElementById('modal-link'),
+    wa: d.getElementById('modal-wa'),
+  };
+  let lastTrigger = null;
+  let closing = false;
+  let galleryCount = 1;
+
+  const galleryIndex = () => {
+    const g = modal.gallery;
+    const w = g.clientWidth || 1;
+    const max = g.scrollWidth - g.clientWidth;
+    if (max > 0 && g.scrollLeft >= max - 2) return galleryCount - 1;
+    return Math.max(0, Math.min(galleryCount - 1, Math.round(g.scrollLeft / w)));
+  };
+  const syncGallery = () => {
+    if (!modal) return;
+    const i = galleryIndex();
+    if (modal.count) modal.count.textContent = (i + 1) + ' / ' + galleryCount;
+    if (modal.gprev) modal.gprev.disabled = i <= 0;
+    if (modal.gnext) modal.gnext.disabled = i >= galleryCount - 1;
+    if (modal.thumbs) [...modal.thumbs.children].forEach((b, k) => b.classList.toggle('is-active', k === i));
+  };
+  const goGallery = (i) => {
+    const g = modal.gallery;
+    const to = Math.max(0, Math.min(galleryCount - 1, i));
+    g.scrollTo({ left: to * g.clientWidth, behavior: reduced ? 'auto' : 'smooth' });
+  };
+
+  const fillModal = (p, i) => {
+    const fotos = Array.isArray(p.fotos) ? p.fotos.filter((f) => f && f.src) : [];
+    galleryCount = Math.max(1, fotos.length);
+    modal.gallery.innerHTML = fotos.length
+      ? fotos.map((f, k) => '<figure class="gallery__item"><img src="' + esc(f.src) + '" alt="' + esc(f.alt || p.nombre) + '" loading="' + (k ? 'lazy' : 'eager') + '" decoding="async"></figure>').join('')
+      : placeholder(p, i, 'gallery__item');
+    modal.thumbs.innerHTML = fotos.length > 1
+      ? fotos.map((f, k) => '<button type="button" data-to="' + k + '" aria-label="Foto ' + (k + 1) + ' de ' + fotos.length + '"><img src="' + esc(f.src) + '" alt="" loading="lazy"></button>').join('')
+      : '';
+    modal.wrap.classList.toggle('is-single', fotos.length < 2);
+    modal.gallery.scrollLeft = 0;
+
+    modal.comuna.textContent = p.comuna || '';
+    modal.tag.textContent = p.etiqueta || '';
+    modal.tag.hidden = !p.etiqueta;
+    modal.title.textContent = p.nombre || '';
+    modal.price.textContent = p.desde || '';
+    modal.price.hidden = !p.desde;
+    if (modal.dev) { modal.dev.textContent = p.inmobiliaria || ''; modal.dev.hidden = !p.inmobiliaria; }
+    modal.desc.innerHTML = paragraphs(p.descripcion).map((t) => '<p>' + esc(t) + '</p>').join('');
+
+    const datos = Array.isArray(p.datos) ? p.datos.filter((r) => Array.isArray(r) && r.length >= 2 && r[1]) : [];
+    modal.data.innerHTML = datos.map((r) => '<div><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>').join('');
+    modal.data.hidden = !datos.length;
+
+    if (modal.link) {
+      modal.link.hidden = !p.enlace;
+      if (p.enlace) modal.link.href = p.enlace;
+    }
+    if (modal.wa) {
+      const msg = 'Hola Marcela, me interesa el proyecto ' + p.nombre + (p.comuna ? ' (' + p.comuna + ')' : '') + '. ¿Me puedes enviar más información?';
+      modal.wa.href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(msg);
+    }
+    syncGallery();
+  };
+
+  const openProject = (id, trigger) => {
+    if (!dialog || !modal) return;
+    const i = PROJECTS.findIndex((x) => x.id === id);
+    if (i === -1) return;
+    fillModal(PROJECTS[i], i);
+    lastTrigger = trigger || null;
+    closing = false;
+    if (typeof dialog.showModal === 'function') { if (!dialog.open) dialog.showModal(); }
+    else dialog.setAttribute('open', '');
+    root.classList.add('modal-open');
+    if (dialog.querySelector('.modal__inner')) dialog.querySelector('.modal__inner').scrollTop = 0;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      dialog.classList.add('is-open');
+      syncGallery();
+    }));
+    if (history.replaceState) history.replaceState(null, '', '#proyecto=' + encodeURIComponent(id));
+  };
+
+  const closeProject = () => {
+    if (!dialog || !dialog.open || closing) return;
+    closing = true;
+    dialog.classList.remove('is-open');
+    root.classList.remove('modal-open');
+    const done = () => {
+      closing = false;
+      if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
+      if (lastTrigger && d.contains(lastTrigger)) lastTrigger.focus({ preventScroll: true });
+      /* Si el cierre vino de un enlace interno (#registro) el hash ya cambió: lo respetamos */
+      if (history.replaceState && /^#proyecto=/.test(location.hash)) history.replaceState(null, '', '#proyectos');
+    };
+    if (reduced) done(); else setTimeout(done, 460);
+  };
+
+  if (dialog && modal) {
+    dialog.addEventListener('cancel', (e) => { e.preventDefault(); closeProject(); });
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) { closeProject(); return; }       // clic en el fondo
+      if (e.target.closest('[data-close]')) closeProject();
+      const th = e.target.closest('.gallery__thumbs [data-to]');
+      if (th) goGallery(+th.dataset.to);
+      const gb = e.target.closest('[data-gdir]');
+      if (gb) goGallery(galleryIndex() + (+gb.dataset.gdir));
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (galleryCount < 2) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); goGallery(galleryIndex() + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goGallery(galleryIndex() - 1); }
+    });
+    let gTick = false;
+    modal.gallery.addEventListener('scroll', () => {
+      if (gTick) return;
+      gTick = true;
+      requestAnimationFrame(() => { syncGallery(); gTick = false; });
+    }, { passive: true });
+    addEventListener('resize', () => { if (dialog.open) syncGallery(); });
+  }
+
+  /* --- Carrusel (bucle infinito) ---
+     La pista lleva copias de las tarjetas a ambos lados de las reales. Cuando el
+     scroll se asienta sobre una copia, saltamos sin animación a la tarjeta real
+     equivalente: como el snap deja la pista exactamente sobre una tarjeta, el
+     salto es invisible y desde la última siempre se ve venir la primera. */
+  if (track && carousel && PROJECTS.length) {
+    track.innerHTML = PROJECTS.map(projectCard).join('');
+    const real = [...track.querySelectorAll('.project')];
+    const n = real.length;
+    const loop = n > 1;
+    const dots = d.getElementById('proyectos-dots');
+    const counter = d.getElementById('proyectos-count');
+    const prev = carousel.querySelector('[data-dir="-1"]');
+    const next = carousel.querySelector('[data-dir="1"]');
+    if (dots) {
+      dots.innerHTML = PROJECTS.map((p, i) => '<button type="button" data-to="' + i + '" aria-label="Ir a ' + esc(p.nombre) + '"></button>').join('');
+    }
+    const dotEls = dots ? [...dots.children] : [];
+
+    let cards = real.slice();   // todas las tarjetas en la pista, copias incluidas
+    let K = 0;                  // copias a cada lado
+    let current = 0;            // índice real (0..n-1)
+    let jumping = false;
+
+    const stepOf = () => (cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0].offsetWidth || 1);
+    const origin = () => cards[0].offsetLeft - parseFloat(getComputedStyle(track).paddingLeft || 0);
+    const slotOf = () => { // ranura (posición en la pista) más cercana al scroll actual
+      const step = stepOf();
+      return Math.max(0, Math.min(cards.length - 1, Math.round((track.scrollLeft - origin()) / step)));
+    };
+    const mod = (i) => ((i % n) + n) % n;
+
+    const clone = (src) => {
+      const c = src.cloneNode(true);
+      c.removeAttribute('data-reveal');
+      c.classList.add('in', 'is-clone');
+      c.setAttribute('aria-hidden', 'true');
+      c.removeAttribute('role');
+      c.style.removeProperty('--d');
+      c.querySelectorAll('button, a').forEach((el) => el.setAttribute('tabindex', '-1'));
+      c.querySelectorAll('img').forEach((img) => img.setAttribute('loading', 'lazy'));
+      return c;
+    };
+
+    /* Cuántas copias hacen falta para que, parado en la primera o la última
+       tarjeta real, la pista siga llena hasta el borde de la pantalla. */
+    const neededK = () => Math.max(2, Math.ceil(track.clientWidth / stepOf()) + 1);
+
+    const build = () => {
+      track.querySelectorAll('.is-clone').forEach((c) => c.remove());
+      cards = real.slice();
+      K = 0;
+      if (!loop) return;
+      K = neededK();
+      const before = d.createDocumentFragment();
+      const after = d.createDocumentFragment();
+      for (let i = 0; i < K; i++) {
+        before.appendChild(clone(real[mod(n - K + i)]));   // …, n-2, n-1
+        after.appendChild(clone(real[mod(i)]));            // 0, 1, …
+      }
+      track.insertBefore(before, real[0]);
+      track.appendChild(after);
+      cards = [...track.querySelectorAll('.project')];
+    };
+
+    const jumpTo = (slot) => {
+      jumping = true;
+      track.classList.add('is-jumping');
+      track.scrollTo({ left: origin() + slot * stepOf(), behavior: 'instant' });
+      requestAnimationFrame(() => { track.classList.remove('is-jumping'); jumping = false; });
+    };
+
+    /* La pista sangra hasta los bordes del viewport: el margen negativo es la
+       distancia real desde el contenedor al borde, que solo se conoce en runtime. */
+    const bleed = () => {
+      const left = Math.max(0, Math.round(carousel.getBoundingClientRect().left));
+      track.style.setProperty('--bleed', left + 'px');
+    };
+
+    const sync = () => {
+      const slot = slotOf();
+      current = loop ? mod(slot - K) : slot;
+      cards.forEach((c, k) => c.classList.toggle('is-current', k === slot));
+      dotEls.forEach((b, k) => {
+        b.classList.toggle('is-active', k === current);
+        b.setAttribute('aria-current', k === current ? 'true' : 'false');
+      });
+      if (counter) counter.textContent = pad2(current + 1) + ' / ' + pad2(n);
+      if (!loop) {
+        const max = track.scrollWidth - track.clientWidth;
+        if (prev) prev.disabled = track.scrollLeft <= 2;
+        if (next) next.disabled = track.scrollLeft >= max - 2;
+        carousel.classList.toggle('is-static', max <= 2);
+      }
+    };
+
+    /* Al asentarse el scroll sobre una copia, volvemos a la tarjeta real equivalente */
+    const settle = () => {
+      if (!loop || jumping) return;
+      const slot = slotOf();
+      if (slot < K) jumpTo(slot + n);
+      else if (slot >= K + n) jumpTo(slot - n);
+    };
+
+    const goToSlot = (slot) => {
+      track.scrollTo({ left: origin() + slot * stepOf(), behavior: reduced ? 'auto' : 'smooth' });
+    };
+    /* Avanza `delta` tarjetas desde la actual, siempre por el camino corto */
+    const move = (delta) => goToSlot(slotOf() + delta);
+    /* Va al proyecto real `i` por el lado más cercano */
+    const goTo = (i) => {
+      if (!loop) { goToSlot(Math.max(0, Math.min(n - 1, i))); return; }
+      const slot = slotOf();
+      let delta = mod(i) - mod(slot - K);
+      if (delta > n / 2) delta -= n;
+      if (delta < -n / 2) delta += n;
+      goToSlot(slot + delta);
+    };
+
+    let tick = false;
+    let settleTimer = 0;
+    const supportsScrollEnd = 'onscrollend' in window;
+    track.addEventListener('scroll', () => {
+      if (!tick) {
+        tick = true;
+        requestAnimationFrame(() => { sync(); tick = false; });
+      }
+      if (!supportsScrollEnd) {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(settle, 120);
+      }
+    }, { passive: true });
+    if (supportsScrollEnd) track.addEventListener('scrollend', settle);
+
+    let resizeTimer = 0;
+    addEventListener('resize', () => {
+      bleed();
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const keep = current;
+        if (loop && neededK() !== K) build();
+        jumpTo((loop ? K : 0) + keep);
+        sync();
+      }, 120);
+    });
+
+    if (prev) prev.addEventListener('click', () => move(-1));
+    if (next) next.addEventListener('click', () => move(1));
+    if (dots) dots.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-to]');
+      if (b) goTo(+b.dataset.to);
+    });
+    track.addEventListener('keydown', (e) => {
+      if (e.target !== track) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); move(1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); move(-1); }
+      if (e.key === 'Enter') { e.preventDefault(); openProject(real[current].dataset.id, track); }
+    });
+
+    /* Arrastre con mouse (en táctil el scroll nativo ya lo hace) */
+    let dragged = false;
+    if (finePointer) {
+      let down = false, startX = 0, startLeft = 0, moved = 0;
+      track.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'mouse' || e.button !== 0) return;
+        down = true; moved = 0; startX = e.clientX; startLeft = track.scrollLeft;
+      });
+      track.addEventListener('pointermove', (e) => {
+        if (!down) return;
+        const dx = e.clientX - startX;
+        if (!moved && Math.abs(dx) < 5) return;
+        if (!moved) { track.classList.add('is-dragging'); track.setPointerCapture(e.pointerId); }
+        moved = 1;
+        track.scrollLeft = startLeft - dx;
+      });
+      const release = () => {
+        if (!down) return;
+        down = false;
+        if (moved) {
+          dragged = true;
+          setTimeout(() => { dragged = false; }, 50);
+          track.classList.remove('is-dragging');   // vuelve el snap: el navegador reacomoda
+          goToSlot(slotOf());
+        }
+      };
+      track.addEventListener('pointerup', release);
+      track.addEventListener('pointercancel', release);
+      track.addEventListener('lostpointercapture', release);
+    }
+
+    track.addEventListener('click', (e) => {
+      if (dragged) { e.preventDefault(); return; }
+      const card = e.target.closest('.project');
+      if (!card) return;
+      const hit = e.target.closest('[data-open]') || e.target.closest('.project__media');
+      if (!hit) return;
+      /* Si se pulsó una copia, el foco vuelve a la tarjeta real al cerrar */
+      const source = real.find((r) => r.dataset.id === card.dataset.id) || card;
+      openProject(card.dataset.id, source.querySelector('[data-open]') || source);
+    });
+
+    bleed();
+    build();
+    jumpTo(loop ? K : 0);
+    sync();
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(() => { jumpTo((loop ? K : 0) + current); sync(); });
+  } else if (carousel) {
+    carousel.hidden = true;
+  }
+
   /* ---------- Intro (una vez por sesión) ---------- */
   const intro = d.getElementById('intro');
   let introSeen = false;
@@ -476,6 +864,19 @@
       }
     });
   }
+
+  /* ---------- Enlace directo a un proyecto: mdiaz.cl/#proyecto=<id> ----------
+     Útil para compartir por WhatsApp o Instagram. Espera a que termine el intro. */
+  const openFromHash = () => {
+    const m = location.hash.match(/^#proyecto=(.+)$/);
+    if (!m) return;
+    const id = decodeURIComponent(m[1]);
+    if (!PROJECTS.some((p) => p.id === id)) return;
+    const sec = d.getElementById('proyectos');
+    if (sec) sec.scrollIntoView({ block: 'start', behavior: 'auto' });
+    openProject(id, null);
+  };
+  setTimeout(openFromHash, playIntro ? 2400 : 250);
 
   /* ---------- Varios ---------- */
   const year = d.getElementById('year');

@@ -12,8 +12,9 @@ Es un sitio **100% estático**: HTML, CSS y JavaScript sin dependencias ni paso 
 ├── index.html          # Toda la página (nav, hero, servicios, recursos,
 │                       # proyectos, sobre mí, registro, CTA final, footer)
 ├── css/styles.css      # Design system (tokens), componentes y animaciones
-├── js/main.js          # Intro, reveals al scroll, parallax, menú móvil,
-│                       # scrollspy y envío del formulario de registro
+├── js/projects.js      # DATOS de los proyectos (carrusel + modal). Editar aquí.
+├── js/main.js          # Intro, reveals al scroll, parallax, menú móvil, scrollspy,
+│                       # carrusel y modal de proyectos, envío del formulario
 ├── assets/             # Logos, favicon y fotografías
 ├── robots.txt
 └── vercel.json         # Cabeceras de caché/seguridad y clean URLs
@@ -49,6 +50,54 @@ El proyecto no necesita framework ni comando de build.
 npx vercel        # preview
 npx vercel --prod # producción
 ```
+
+## Proyectos (carrusel + modal)
+
+La sección **Proyectos** se dibuja a partir de `js/projects.js`, que expone un
+arreglo `window.MD_PROJECTS`. Es la **única fuente de verdad**: el carrusel
+(tarjetas) y el modal de detalle (galería, descripción, fichas) salen de ahí. No hay
+que tocar HTML ni CSS para agregar, quitar o reordenar proyectos.
+
+### Agregar un proyecto
+
+1. Sube las fotos a `assets/` (idealmente `.webp`, ≤ 1600 px de ancho, < 250 KB).
+2. Agrega un objeto al arreglo:
+
+```js
+{
+  id: "vitacura-parque",          // slug único; da la URL mdiaz.cl/#proyecto=vitacura-parque
+  nombre: "Vitacura Parque",
+  inmobiliaria: "Fundamenta",     // se muestra bajo el nombre
+  comuna: "Vitacura",
+  desde: "Desde 5.200 UF",
+  etiqueta: "Últimas unidades",   // opcional, badge rosa
+  resumen: "Una frase para la tarjeta.",                 // opcional
+  descripcion: ["Párrafo 1 del modal.", "Párrafo 2."],   // string o arreglo
+  datos: [["Tipologías", "1D1B · 2D2B"], ["Entrega", "2026"]], // opcional
+  fotos: [
+    { src: "assets/vitacura-1.webp", alt: "Fachada" },   // la primera es la portada
+    { src: "assets/vitacura-2.webp", alt: "Piscina" },
+  ],
+  enlace: "https://…",            // opcional: botón "Ver ficha completa"
+}
+```
+
+Si `fotos` va vacío se dibuja un placeholder editorial con el número del proyecto.
+El botón **Conversemos** del modal abre WhatsApp con el nombre del proyecto ya
+escrito en el mensaje.
+
+### Enlace directo
+
+Cada proyecto tiene URL propia para compartir: `https://mdiaz.cl/#proyecto=<id>`.
+Al abrirla, la página baja hasta la sección y abre el modal.
+
+### ¿Y si los proyectos cambian seguido?
+
+El archivo JS es la opción más simple para un sitio estático: sin build, sin CORS,
+sin un request extra y funciona incluso abriendo el HTML en local. Si más adelante
+alguien sin acceso al repo necesita editar proyectos, el mismo arreglo puede venir
+de un `data/projects.json` (con `fetch`) o de un CMS/Airtable/Sheets: la forma de los
+datos no cambia, solo de dónde se leen.
 
 ## Formulario de registro → HubSpot
 
@@ -126,7 +175,10 @@ Si prefieres otro destino, deja `HUBSPOT` vacío y define `FORM_ENDPOINT` en
 - **Enviar un registro de prueba** y confirmar que llega a HubSpot. La Forms API
   rechaza los campos que no existan en el formulario, así que el formulario del
   portal debe incluir `firstname`, `lastname`, `email` y `phone`.
-- Los proyectos 1, 2 y 3 usan placeholders. Reemplaza el `<div class="ph …">` de
-  cada tarjeta por `<img src="assets/proyecto-N.jpg" alt="…">` cuando existan las fotos.
+- Los datos de `js/projects.js` salen de los sitios públicos de cada inmobiliaria
+  (Brouk exige login): contrastar precios y condiciones de convenio antes de publicar.
+- Cada proyecto tiene una sola foto. Para la galería del modal basta con sumar más
+  entradas en `fotos` (idealmente `.webp` ≤ 1600 px; con ffmpeg:
+  `ffmpeg -i foto.jpg -vf "scale=1600:-2" -c:v libwebp -quality 82 foto.webp`).
 - Los enlaces de *Términos y condiciones*, *Política de privacidad*, LinkedIn y
   Facebook apuntan a `#` y están a la espera de sus URLs definitivas.

@@ -202,7 +202,7 @@
     </div>
   </section>
 
-  <!-- Proyectos -->
+  <!-- Proyectos: las tarjetas se dibujan desde js/projects.js -->
   <section id="proyectos" class="section bg-cream">
     <div class="container">
       <div class="section-title" data-reveal>
@@ -212,54 +212,67 @@
         <h2>Oportunidades de inversión</h2>
         <p>Una selección de proyectos con potencial de renta en Santiago. Regístrate para conocer los detalles.</p>
       </div>
-      <div class="grid grid--projects" data-stagger>
-        <article class="project" data-reveal>
-          <div class="project__media">
-            <img src="assets/nunoa.webp" alt="nunoa"> 
-            <div class="ph ph--1" role="img" aria-label="Foto del proyecto 1">
-              <svg class="ph__mark" viewBox="0 0 200 160" fill="none" stroke-width="10"><path d="M10 150 L74 10 L138 150" stroke="#C8A0A0"/><path d="M106.6 53.2 L125.9 10 L190 150" stroke="#C8A868"/></svg>
-              <span class="ph__num">01</span>
-              <span class="ph__label">Ñuñoa</span>
-            </div>
+
+      <div class="carousel" id="proyectos-carousel">
+        <div class="carousel__track" id="proyectos-track" role="list" aria-label="Proyectos" tabindex="0"></div>
+        <div class="carousel__bar" data-reveal="fade" style="--d:300">
+          <div class="carousel__meta">
+            <span class="carousel__count" id="proyectos-count" aria-live="polite">01 / 01</span>
+            <div class="carousel__dots" id="proyectos-dots" aria-label="Ir al proyecto"></div>
           </div>
-          <div class="project__body">
-            <span class="badge">Ñuñoa</span>
-            <h3>Ñuñoa 2024</h3>
-            <div class="project__foot">
-              <span>Desde 3.431 UF</span>
-              <a class="btn btn--ghost btn--sm" target="_blank" href="https://brouk.app/proyectos/nunoa-2024">Ver detalles</a>
-            </div>
+          <div class="carousel__nav">
+            <button class="carousel__btn" type="button" data-dir="-1" aria-label="Proyecto anterior" aria-controls="proyectos-track">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg>
+            </button>
+            <button class="carousel__btn" type="button" data-dir="1" aria-label="Proyecto siguiente" aria-controls="proyectos-track">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg>
+            </button>
           </div>
-        </article>
-        <article class="project" data-reveal>
-          <div class="project__media">
-            <img src="assets/stgocentro.png" alt="Santiago Centro">
-          </div>
-          <div class="project__body">
-            <span class="badge">Santiago Centro</span>
-            <h3>131 Wood</h3>
-            <div class="project__foot">
-              <span>Desde 3.019 UF</span>
-              <a class="btn btn--ghost btn--sm" target="_blank" href="https://brouk.app/proyectos/131wood">Ver detalles</a>
-            </div>
-          </div>
-        </article>
-        <article class="project" data-reveal>
-          <div class="project__media">
-            <img src="assets/laflorida.jpg" alt="La Florida">
-          </div>
-          <div class="project__body">
-            <span class="badge">La Florida</span>
-            <h3>Liverpool</h3>
-            <div class="project__foot">
-              <span>Desde 4.630 UF</span>
-              <a class="btn btn--ghost btn--sm" target="_blank" href="https://brouk.app/proyectos/liverpool">Ver detalles</a>
-            </div>
-          </div>
-        </article>
+        </div>
+        <noscript>
+          <p class="carousel__noscript">Activa JavaScript para ver los proyectos, o <a href="https://wa.me/56951497482" target="_blank" rel="noopener">escríbeme por WhatsApp</a> y te envío las fichas.</p>
+        </noscript>
       </div>
     </div>
   </section>
+
+  <!-- Modal de proyecto (contenido desde js/projects.js) -->
+  <dialog class="modal" id="proyecto-modal" aria-labelledby="modal-title">
+    <div class="modal__inner">
+      <button class="modal__close" type="button" aria-label="Cerrar" data-close>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+      <div class="gallery" id="modal-gallery-wrap">
+        <div class="gallery__track" id="modal-gallery" aria-live="polite"></div>
+        <button class="gallery__btn gallery__btn--prev" type="button" data-gdir="-1" aria-label="Foto anterior">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg>
+        </button>
+        <button class="gallery__btn gallery__btn--next" type="button" data-gdir="1" aria-label="Foto siguiente">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg>
+        </button>
+        <div class="gallery__foot">
+          <span class="gallery__count" id="modal-count">1 / 1</span>
+          <div class="gallery__thumbs" id="modal-thumbs"></div>
+        </div>
+      </div>
+      <div class="modal__body">
+        <div class="modal__badges">
+          <span class="badge" id="modal-comuna"></span>
+          <span class="badge badge--rose" id="modal-tag" hidden></span>
+        </div>
+        <h3 class="modal__title" id="modal-title"></h3>
+        <p class="modal__dev" id="modal-dev" hidden></p>
+        <p class="modal__price" id="modal-price"></p>
+        <div class="modal__desc" id="modal-desc"></div>
+        <dl class="modal__data" id="modal-data" hidden></dl>
+        <div class="modal__actions">
+          <a class="btn" href="#registro" data-close>Quiero más información</a>
+          <a class="btn btn--outline" id="modal-wa" href="https://wa.me/56951497482" target="_blank" rel="noopener">Conversemos</a>
+          <a class="btn btn--ghost" id="modal-link" href="#" target="_blank" rel="noopener" hidden>Ver ficha completa</a>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
   <!-- Sobre mí -->
   <section id="sobre-mi" class="section bg-white">
@@ -383,6 +396,7 @@
 
 <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/51801072.js"></script>
 
+<script src="js/projects.js" defer></script>
 <script src="js/main.js" defer></script>
 
 </body>
