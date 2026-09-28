@@ -18,11 +18,18 @@
      datos         opcional · pares [etiqueta, valor] que se listan en el modal
      fotos         arreglo de { src, alt }. La primera es la portada de la tarjeta.
                    Si viene vacío se dibuja un placeholder editorial.
-     enlace        opcional · URL de la ficha externa ("Ver ficha completa")
+     enlace        opcional · URL de una ficha externa ("Ver ficha completa").
+                   Hoy ningún proyecto lo usa, y es deliberado: Marcela vende estos
+                   proyectos, así que el modal termina en "Conversemos" por WhatsApp
+                   y no deriva el cliente al sitio de la inmobiliaria. El campo se
+                   mantiene por si alguna vez conviene enlazar uno en particular;
+                   al omitirlo, el botón simplemente no se dibuja. Las fichas
+                   oficiales quedan como comentario en cada proyecto, para consulta
+                   interna.
 
    Fuentes (sep. 2026): sitios públicos de cada inmobiliaria y portales. Brouk
    exige inicio de sesión, así que los precios/condiciones de convenio deben
-   verificarse ahí antes de publicar. Fotos: pendientes de subir a assets/.
+   verificarse ahí antes de publicar.
 */
 window.MD_PROJECTS = [
   {
@@ -45,7 +52,7 @@ window.MD_PROJECTS = [
       ["Amenities", "Piscina · Quincho con fogón · Cowork · Bike center"],
     ],
     fotos: [{ src: "assets/stay-1.jpg", alt: "Fachada Edificio Stay" }],
-    enlace: "https://www.edificiostay.cl/",
+    // Ficha oficial, solo como referencia interna: https://www.edificiostay.cl/
   },
   {
     id: "eco-florida",
@@ -67,8 +74,7 @@ window.MD_PROJECTS = [
       ["Metro", "Vicuña Mackenna L4/L4A · Bellavista de La Florida L5"],
     ],
     fotos: [{ src: "assets/eco-florida-1.webp", alt: "Fachada Eco Florida" }],
-    enlace:
-      "https://www.fundamenta.cl/proyectos-en-venta/departamento-en-la-florida/eco-florida/",
+    // Ficha oficial, solo como referencia interna: https://www.fundamenta.cl/proyectos-en-venta/departamento-en-la-florida/eco-florida/
   },
   {
     id: "pintor-cicarelli",
@@ -92,7 +98,7 @@ window.MD_PROJECTS = [
     fotos: [
       { src: "assets/cicarelli-1.webp", alt: "Fachada Pintor Cicarelli II" },
     ],
-    enlace: "https://maestra.cl/proyectos/pintor-cicarelli-ii/",
+    // Ficha oficial, solo como referencia interna: https://maestra.cl/proyectos/pintor-cicarelli-ii/
   },
   {
     id: "teatinos-727",
@@ -114,7 +120,7 @@ window.MD_PROJECTS = [
       ["Metro", "Plaza de Armas · L3/L5, a pasos de L1 y L2"],
     ],
     fotos: [{ src: "assets/teatinos-1.webp", alt: "Fachada Teatinos 727" }],
-    enlace: "https://www.imonteclaro.cl/teatinos",
+    // Ficha oficial, solo como referencia interna: https://www.imonteclaro.cl/teatinos
   },
   {
     id: "jardines-de-alvarado",
@@ -124,7 +130,7 @@ window.MD_PROJECTS = [
     desde: "Desde 2.430 UF",
     etiqueta: "Entrega inmediata",
     resumen:
-      "El precio de entrada más bajo de la selección, cerca del metro Plaza Chacabuco y Autopista Central.",
+      "Ticket de entrada bajo, cerca del metro Plaza Chacabuco y de la Autopista Central.",
     descripcion: [
       "Jardines de Alvarado, en Coronel Alvarado 2505, Independencia, queda cerca del metro Plaza Chacabuco, de Avenida Vivaceta y de la Autopista Central, con supermercados, colegios y servicios en el entorno.",
       "Departamentos de 1, 2 y 3 dormitorios con cortinas roller, cocina amoblada, walk-in closet, aislación térmica EIFS con termopaneles PVC e instalación para lavadora. Con promoción, desde 2.187 UF (bases en maestra.cl).",
@@ -138,7 +144,7 @@ window.MD_PROJECTS = [
     fotos: [
       { src: "assets/alvarado-1.jpg", alt: "Fachada Jardines de Alvarado" },
     ],
-    enlace: "https://maestra.cl/proyectos/jardines-de-alvarado/",
+    // Ficha oficial, solo como referencia interna: https://maestra.cl/proyectos/jardines-de-alvarado/
   },
   {
     id: "nunoa-2024",
@@ -160,6 +166,71 @@ window.MD_PROJECTS = [
       ["Sala de ventas", "Francisco de Paula 2024, Ñuñoa"],
     ],
     fotos: [{ src: "assets/nunoa.webp", alt: "Proyecto Ñuñoa 2024" }],
-    enlace: "https://nunoa2024.cl/",
+    // Ficha oficial, solo como referencia interna: https://nunoa2024.cl/
+  },
+  {
+    id: "eco-valdes",
+    nombre: "Eco Valdés I",
+    inmobiliaria: "Fundamenta",
+    comuna: "La Florida",
+    desde: "Desde 2.162 UF",
+    etiqueta: "Entrega inmediata",
+    resumen:
+      "Studios y departamentos de 1 y 2 dormitorios sobre la estación Vicente Valdés, donde se cruzan dos líneas de metro.",
+    descripcion: [
+      "Eco Valdés I está en Vicente Valdés 615, La Florida, sobre uno de los nodos mejor conectados del sur de Santiago: la estación Vicente Valdés reúne las líneas 4 y 5, y Vicuña Mackenna queda a pocas cuadras.",
+      "Edificio de 8 pisos con studios y departamentos de 1 y 2 dormitorios, de 30 a 52 m². Áreas comunes con piscina, quinchos, fitness zone, cowork, salón gourmet, lounge TV, sala de lavado y pet zone.",
+    ],
+    datos: [
+      ["Dirección", "Vicente Valdés 615, La Florida"],
+      ["Tipologías", "Studio · 1D1B · 2D1B"],
+      ["Superficie", "30,1 a 51,9 m²"],
+      ["Metro", "Vicente Valdés · L4/L5"],
+    ],
+    fotos: [{ src: "assets/eco-valdes.webp", alt: "Proyecto Eco Valdés I" }],
+  },
+  {
+    id: "nexus-vespucio",
+    nombre: "Nexus Vespucio",
+    inmobiliaria: "Costa Pacífico",
+    comuna: "La Cisterna",
+    desde: "Desde 2.100 UF",
+    etiqueta: "Entrega inmediata",
+    resumen:
+      "Departamentos de 1, 2 y 3 dormitorios a una cuadra de la Intermodal La Cisterna, donde se cruzan dos líneas de metro.",
+    descripcion: [
+      "Nexus Vespucio está en Paulina 8753, La Cisterna, a una cuadra de la estación Intermodal La Cisterna, donde las líneas 2 y 4A del metro se cruzan con los buses interurbanos: conexión directa con el centro y con el sur de la región.",
+      "Departamentos de 1, 2 y 3 dormitorios con living comedor amplio, cocina integrada amoblada y equipada, walk-in closet en el dormitorio principal, piso vinílico SPC, grandes ventanales y terraza propia. Conserjería 24/7, piscina, quincho, terraza panorámica, cowork, kitchenette y áreas verdes; pet friendly.",
+    ],
+    datos: [
+      ["Dirección", "Paulina 8753, La Cisterna"],
+      ["Tipologías", "1D · 2D · 3D (siete tipologías, A a G)"],
+      ["Metro", "Intermodal La Cisterna · L2/L4A"],
+      ["Sala de ventas", "Av. Américo Vespucio 231, La Cisterna"],
+    ],
+    fotos: [{ src: "assets/nexusfachada.webp", alt: "Proyecto Nexus Vespucio" }],
+  },
+  {
+    id: "briones-luco-0920",
+    nombre: "Briones Luco 0920",
+    inmobiliaria: "Valle Sur",
+    comuna: "La Cisterna",
+    desde: "Desde 1.990 UF", // confirmar el "desde" vigente: los portales van de 1.890 a 2.324 UF
+    etiqueta: "Entrega inmediata",
+    resumen:
+      "Departamentos de 1 y 2 dormitorios a pocas cuadras del metro Lo Ovalle, en el límite con San Miguel.",
+    descripcion: [
+      "Briones Luco 0920 está en un sector residencial consolidado y poco densificado de La Cisterna, en el límite con San Miguel: metro Lo Ovalle a pocas cuadras, y Gran Avenida y la Autopista Central a mano para salir en auto.",
+      "Departamentos de 1 y 2 dormitorios, de 37 a 58 m², con piso gres, ventanas de PVC con termopanel, terraza con baranda de cristal, shower door y vanitorio en el baño principal, y cocina amoblada con cubierta de granito, horno, encimera y campana eléctrica.",
+      "Áreas comunes en cubierta con piscina, quinchos y gimnasio equipado, más hall de acceso de doble altura, cowork, sala de juegos y salas multiuso. Conserjería 24 horas y accesos controlados por circuito cerrado de televisión.",
+    ],
+    datos: [
+      ["Dirección", "Briones Luco 0920, La Cisterna"],
+      ["Tipologías", "1D · 2D"],
+      ["Superficie", "37 a 58 m²"],
+      ["Metro", "Lo Ovalle · L2"],
+    ],
+    fotos: [{ src: "assets/fachadabriones.webp", alt: "Proyecto Briones Luco 0920" }],
+    // Ficha oficial, solo como referencia interna: https://invs.cl/project/edificio-briones-luco-0920/
   },
 ];
