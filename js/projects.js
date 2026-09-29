@@ -233,4 +233,92 @@ window.MD_PROJECTS = [
     fotos: [{ src: "assets/fachadabriones.webp", alt: "Proyecto Briones Luco 0920" }],
     // Ficha oficial, solo como referencia interna: https://invs.cl/project/edificio-briones-luco-0920/
   },
+  {
+    id: "limit-apartments",
+    nombre: "Limit Apartments",
+    inmobiliaria: "Santolaya", // comercializa S. Silva (limit@ssilva.cl)
+    comuna: "Macul",
+    desde: "Desde 2.954 UF",
+    etiqueta: "", // confirmar estado: la entrega estaba prevista para el 2º semestre de 2025
+    resumen:
+      "Departamentos de 1 y 2 dormitorios con piscina, gimnasio y cowork, con salida directa a la Autopista Vespucio Sur.",
+    descripcion: [
+      "Limit Apartments está en Mayor Abe 3090, sector Las Dalias de Macul, con acceso directo desde la Autopista Vespucio Sur: una ubicación pensada para moverse rápido hacia el oriente y el centro, con supermercados, comercio y servicios en el entorno.",
+      "Seis tipologías de 1 y 2 dormitorios, con plantas compactas desde 35,6 m² totales. Cocina full electric con cubierta de cuarzo, porcelanato símil madera y ventanas de PVC con termopanel. Áreas comunes con piscina, gimnasio, quincho y cowork.",
+    ],
+    datos: [
+      ["Dirección", "Mayor Abe 3090, Macul"],
+      ["Tipologías", "1D1B · 2D2B (seis tipologías)"],
+      ["Superficie", "Desde 35,6 m² totales"],
+      ["Amenities", "Piscina · Gimnasio · Quincho · Cowork"],
+    ],
+    fotos: [{ src: "assets/limit.webp", alt: "Fachada de Limit Apartments" }],
+    // Ficha oficial, solo como referencia interna: https://edificiolimit.cl/
+  },
+  {
+    id: "puerta-la-florida",
+    nombre: "Puerta La Florida",
+    inmobiliaria: "S. Silva",
+    comuna: "La Florida",
+    desde: "Desde 2.353 UF",
+    etiqueta: "Próxima entrega",
+    resumen:
+      "Studios y departamentos de 1 dormitorio frente al Mall Florida Center, a pasos de dos estaciones de la línea 5.",
+    descripcion: [
+      "Puerta La Florida está en Av. Vicuña Mackenna Poniente 5860, justo frente al Mall Florida Center y a pasos de las estaciones Mirador y Pedrero de la línea 5. Universidades, supermercados y comercio a la mano: un proyecto pensado tanto para vivir como para arrendar.",
+      "Edificio de 11 pisos con studios desde 20,6 m² útiles y departamentos de 1 dormitorio y 1 baño, con ventanas termopanel y cubiertas de granito en la cocina. Recepción, cowork, sala multiuso, lavandería, quinchos y bicicleteros. Pie del 5% pagadero hasta en 24 cuotas.",
+    ],
+    datos: [
+      ["Dirección", "Av. Vicuña Mackenna Poniente 5860, La Florida"],
+      ["Tipologías", "Studio · 1D1B"],
+      ["Superficie", "Studios desde 20,6 m² útiles"],
+      ["Metro", "Mirador y Pedrero · L5"],
+    ],
+    fotos: [{ src: "assets/puertalaflorida.webp", alt: "Fachada de Puerta La Florida" }],
+    // Ficha oficial, solo como referencia interna: https://puertalaflorida.cl/
+  },
+  {
+    id: "neohaus-vitacura",
+    nombre: "Neohaus Vitacura",
+    inmobiliaria: "Neohaus",
+    comuna: "Vitacura",
+    desde: "Desde 5.600 UF", // confirmar: los portales muestran desde 5.600 a 6.790 UF según la fecha
+    etiqueta: "Entrega inmediata",
+    resumen:
+      "Departamentos de 1 y 2 dormitorios en Av. Las Condes, con piscina panorámica en el piso 16 y placa comercial propia.",
+    descripcion: [
+      "Neohaus Vitacura está en Av. Las Condes 12.170, en el eje comercial y de servicios de Vitacura. Son dos torres de 15 pisos más terraza, con 250 departamentos sobre una plaza central con placa comercial: el barrio resuelto en el mismo edificio.",
+      "Departamentos de 1 y 2 dormitorios, de 51 a 100 m², amplios y luminosos, con iluminación LED y sensores de presencia. En la terraza del piso 16, piscina panorámica con solárium y dos hidromasajes; además gimnasio, sala de pool climatizada, sala gourmet, sala multimedia, cuatro quinchos, lavandería y talleres multipropósito.",
+    ],
+    datos: [
+      ["Dirección", "Av. Las Condes 12.170, Vitacura"],
+      ["Tipologías", "1D1B · 2D2B"],
+      ["Superficie", "51 a 100 m²"],
+      ["Amenities", "Piscina panorámica · Hidromasajes · Gimnasio · Sala gourmet"],
+    ],
+    fotos: [{ src: "assets/neohaus-vitacura.webp", alt: "Torres de Neohaus Vitacura" }],
+    // Ficha oficial, solo como referencia interna: https://www.neohaus.cl/neohaus-vitacura/
+  },
+  {
+    id: "neohaus-la-dehesa",
+    nombre: "Neohaus La Dehesa",
+    inmobiliaria: "Neohaus",
+    comuna: "Lo Barnechea",
+    desde: "Desde 5.440 UF", // confirmar: los portales muestran desde 5.440 a 6.718 UF según la fecha
+    etiqueta: "Entrega inmediata",
+    resumen:
+      "Departamentos de 1 y 2 dormitorios equipados de fábrica, en el polo comercial de La Dehesa.",
+    descripcion: [
+      "Neohaus La Dehesa está en Av. La Dehesa 1540, Lo Barnechea, dentro de un desarrollo de uso mixto con oficinas y comercio. El Mall Portal La Dehesa, la Clínica Santa María y un Jumbo quedan a doscientos metros; colegios y clínicas, en el entorno inmediato.",
+      "Departamentos de 1 y 2 dormitorios, de 47 a 92 m², que se entregan listos para habitar: cocina equipada con horno, campana retráctil, vitrocerámica, microondas, refrigerador y lavavajillas; aire acondicionado split independiente; baños en mármol travertino con losa radiante y toallero calefaccionado; piso flotante y equipamiento full electric. Piscina, terraza panorámica y zona de jacuzzi.",
+    ],
+    datos: [
+      ["Dirección", "Av. La Dehesa 1540, Lo Barnechea"],
+      ["Tipologías", "1D1B · 2D2B"],
+      ["Superficie", "47 a 92 m²"],
+      ["Entorno", "Mall Portal La Dehesa y Clínica Santa María a 200 m"],
+    ],
+    fotos: [{ src: "assets/neohaus-dehesa.webp", alt: "Fachada y piscina de Neohaus La Dehesa" }],
+    // Ficha oficial, solo como referencia interna: https://www.neohaus.cl/neohaus-la-dehesa-departamentos/
+  },
 ];
