@@ -106,7 +106,7 @@ window.MD_PROJECTS = [
     inmobiliaria: "AJ Urbana", // la ficha pública (imonteclaro.cl/teatinos) es de Monteclaro Inmobiliaria: confirmar
     comuna: "Santiago Centro",
     desde: "Desde 2.858 UF",
-    etiqueta: "",
+    etiqueta: "Entrega inmediata",
     resumen:
       "Studios y departamentos de 1 y 2 dormitorios en el centro cívico, a menos de 5 minutos de cuatro líneas de metro.",
     descripcion: [
@@ -152,7 +152,7 @@ window.MD_PROJECTS = [
     inmobiliaria: "FDI", // el sitio oficial (nunoa2024.cl) lleva contacto de FDI (gmora@fdi.cl): confirmar
     comuna: "Ñuñoa",
     desde: "Desde 3.431 UF",
-    etiqueta: "",
+    etiqueta: "Entrega inmediata",
     resumen:
       "Cuatro tipologías de 1 a 3 dormitorios en Rodrigo de Araya, con amplias áreas comunes y metro cerca.",
     descripcion: [
@@ -239,7 +239,7 @@ window.MD_PROJECTS = [
     inmobiliaria: "Santolaya", // comercializa S. Silva (limit@ssilva.cl)
     comuna: "Macul",
     desde: "Desde 2.954 UF",
-    etiqueta: "", // confirmar estado: la entrega estaba prevista para el 2º semestre de 2025
+    etiqueta: "Entrega inmediata", // confirmar estado: la entrega estaba prevista para el 2º semestre de 2025
     resumen:
       "Departamentos de 1 y 2 dormitorios con piscina, gimnasio y cowork, con salida directa a la Autopista Vespucio Sur.",
     descripcion: [
@@ -261,7 +261,7 @@ window.MD_PROJECTS = [
     inmobiliaria: "S. Silva",
     comuna: "La Florida",
     desde: "Desde 2.353 UF",
-    etiqueta: "Próxima entrega",
+    etiqueta: "Entrega inmediata",
     resumen:
       "Studios y departamentos de 1 dormitorio frente al Mall Florida Center, a pasos de dos estaciones de la línea 5.",
     descripcion: [
