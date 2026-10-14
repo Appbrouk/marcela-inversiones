@@ -399,5 +399,15 @@
 <script src="js/projects.js" defer></script>
 <script src="js/main.js" defer></script>
 
+<!-- Vercel Web Analytics. Es la integración para HTML plano: no usa el paquete
+     @vercel/analytics, que requiere bundler. Vercel sirve script.js desde el
+     edge cuando Web Analytics está activado en el proyecto; si está apagado la
+     ruta da 404 y no se recoge nada. La cola window.va evita perder eventos
+     disparados antes de que el script cargue. -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
 </body>
 </html>
