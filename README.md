@@ -15,6 +15,11 @@ Es un sitio **100% estático**: HTML, CSS y JavaScript sin dependencias ni paso 
 ├── js/projects.js      # DATOS de los proyectos (carrusel + modal). Editar aquí.
 ├── js/main.js          # Intro, reveals al scroll, parallax, menú móvil, scrollspy,
 │                       # carrusel y modal de proyectos, envío del formulario
+├── evaluacion.html     # Evaluador de perfil: wizard de 5 pasos
+├── js/evaluacion.js    # Lógica del wizard y del pre-diagnóstico
+├── css/evaluacion.css  # Estilos del evaluador
+├── api/evaluacion.mjs  # Función serverless que recibe las evaluaciones
+├── supabase/leads.sql  # Tabla md_leads (ejecutar una vez)
 ├── assets/             # Logos, favicon y fotografías
 ├── robots.txt
 └── vercel.json         # Cabeceras de caché/seguridad y clean URLs
@@ -169,6 +174,94 @@ portal se muestra un mensaje genérico con la alternativa de WhatsApp.
 Si prefieres otro destino, deja `HUBSPOT` vacío y define `FORM_ENDPOINT` en
 `js/main.js` con una URL que reciba un `POST` JSON
 `{ nombre, email, telefono, acepta, origen }`.
+
+## Evaluador de perfil
+
+`/evaluacion` es un wizard de 5 pasos que calcula en vivo la capacidad de
+inversión y sugiere proyectos del catálogo. Portado del evaluador de IMOBU
+(`Appbrouk/imobu-web`), con tres diferencias: no hay sistema de asesores, el
+catálogo sale de `js/projects.js`, y el envío va a una función propia.
+
+### Cómo calcula
+
+Todo sale de `CFG`, al inicio de `js/evaluacion.js`:
+
+| Supuesto | Valor |
+|---|---|
+| Dividendo máximo | 25% de la renta líquida |
+| Carga financiera total | 45% |
+| Tasa anual | 4,5% |
+| Plazo | 25 años |
+| Pie | 20% |
+| Renta mínima referencial | $650.000 |
+| UF | $41.065 |
+
+El dividendo se acota por lo que sea más estricto entre el tope por renta y lo
+que deja libre la deuda ya comprometida. De ahí sale el crédito (anualidad
+despejada), y el precio tope es el crédito dividido por `1 - pie`.
+
+**La UF está fija.** Es referencial y no cierra ninguna operación, pero
+conviene revisarla cada cierto tiempo. El texto de supuestos que aparece bajo
+el panel se arma desde estas mismas constantes, así que nunca puede
+contradecir al cálculo.
+
+### Proyectos sugeridos
+
+Se leen de `window.MD_PROJECTS` y el precio se extrae del campo de texto
+`desde` ("Desde 2.900 UF" → 2900). Un proyecto sin UF legible no entra al
+matcher. Las comunas que se ofrecen en el paso 5 también salen del catálogo:
+al sumar un proyecto en una comuna nueva, aparece sola.
+
+### Backend
+
+`POST /api/evaluacion` (función serverless de Vercel). Es `.mjs` a propósito:
+así usa ESM sin un `package.json`, que cambiaría cómo Vercel detecta el
+proyecto — hoy es estático, sin build.
+
+**1. Crear la tabla:** ejecuta `supabase/leads.sql` en el SQL Editor de
+Supabase.
+
+**2. Variables de entorno en Vercel:**
+
+| Variable | Obligatoria | Para qué |
+|---|---|---|
+| `ALLOWED_ORIGINS` | **Sí** | `https://mdiaz.cl,https://www.mdiaz.cl`. Sin esto la función rechaza todo. |
+| `SUPABASE_URL` | Sí* | URL del proyecto de Supabase |
+| `SUPABASE_ANON_KEY` | Sí* | Clave **anon**, no la service_role (ver más abajo) |
+| `TURNSTILE_SECRET` | No | Anti-bots de Cloudflare |
+| `RESEND_API_KEY` | No | Avisa por correo de cada evaluación |
+| `NOTIFY_EMAIL` | No | Destinatario(s) del aviso |
+| `FROM_EMAIL` | No | Remitente verificado en Resend |
+
+\* Si no hay ningún destino configurado la función responde **503** en vez de
+fingir éxito: una evaluación que se pierde en silencio es peor que un error
+visible.
+
+### Por qué la clave anon y no la service_role
+
+IMOBU escribe con `SUPABASE_SERVICE_ROLE_KEY`, que salta RLS por diseño. Esa
+base está compartida con la operación de Brouk (usuarios, unidades, contactos,
+comisiones), así que una service_role en el entorno de un sitio público daría
+acceso total a todo eso si la variable se filtrara.
+
+Aquí la tabla `md_leads` concede a `anon` **solo INSERT**, y solo en tres
+columnas. Esa credencial no puede leer los leads ni tocar ninguna otra tabla, y
+además nunca llega al navegador porque la función hace de intermediaria.
+
+Para **leer** los leads: panel de Supabase, o una service_role que viva fuera de
+este proyecto.
+
+### Defensas del endpoint
+
+Lista blanca de campos (lo que no esté en ella se descarta), validación de
+correo y teléfono, tope de 20 KB, límite de 6 envíos por IP cada 10 minutos,
+cierre por omisión si falta `ALLOWED_ORIGINS`, y campo trampa para bots. Los
+datos nunca se escriben en los logs: traen renta, deudas y morosidades.
+
+### Retención de datos
+
+`md_leads` guarda datos personales y financieros. Define un plazo de retención
+y decláralo en la política de privacidad.
 
 ## Pendientes conocidos
 
