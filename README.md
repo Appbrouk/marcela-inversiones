@@ -56,6 +56,65 @@ npx vercel        # preview
 npx vercel --prod # producción
 ```
 
+## Diseño: claro y oscuro
+
+El sitio sigue el manual de marca (Ciruela, Burdeo, Rosa palo, Rosa antiguo,
+Dorado, Blush · **Lora** títulos, **Poppins** textos) y cambia de esquema solo
+con `prefers-color-scheme`, es decir según la preferencia del dispositivo. No
+hay interruptor manual.
+
+### Cómo está montado
+
+Todo vive en tokens, al inicio de `css/styles.css`:
+
+- **Marca** — `--ciruela`, `--burdeo`, `--rosa-palo`, `--rosa-antiguo`,
+  `--dorado`, `--blush`. Nunca cambian.
+- **Semánticos** — `--surface-page`, `--surface-raised`, `--text-heading`,
+  `--accent`, `--on-accent`, `--glass`… Es lo único que se redefine en el
+  bloque `@media (prefers-color-scheme: dark)` del final del archivo.
+- **Alias heredados** — `--ink-900`, `--rose-600`, `--cream-100`… El sitio se
+  escribió con esa escala antes del manual. Apuntan a los semánticos para no
+  reescribir 700 reglas.
+
+**Ninguna regla de componente se duplica entre esquemas.** Si al añadir algo
+necesitas escribir una regla dentro del `@media` oscuro, probablemente falte un
+token.
+
+### Reglas al tocar colores
+
+1. **Nunca pongas un color literal en una regla.** Un `#fff` en el fondo de una
+   tarjeta se queda blanco en modo oscuro. Usa `var(--surface-raised)`.
+2. `--ink-900` ya **no** significa "casi negro" sino "el color de mayor
+   contraste del esquema": en oscuro es blush. Para rellenos de botón usa
+   `--accent`, no `--ink-900`.
+3. Los alias se mapearon por **uso real**, no por nombre: `--rose-600` y
+   `--gold-600` solo aparecen como texto, así que en oscuro se aclaran;
+   `--rose-300` y `--gold-400` son fondos y se oscurecen.
+
+### Logo
+
+`assets/logo-lockup-dark.png` y `logo-wordmark-dark.png` se generaron
+recoloreando **solo** los píxeles neutros del original a blush, conservando el
+isotipo en rosa y dorado — que es lo que indica el manual para fondo oscuro.
+Invertir la imagen entera habría estropeado el isotipo. El cambio se hace con
+`content:url()` dentro del bloque oscuro.
+
+Si algún día hay un lockup oficial en negativo, reemplaza esos dos archivos.
+
+### Semáforo del pre-diagnóstico
+
+Los colores de estado (`--estado-ok-fg`, `--estado-warn-fg`, `--estado-risk-fg`)
+están en `css/evaluacion.css`, no en el JS. El medidor de carga financiera
+recibe una clase (`is-ok` / `is-warn` / `is-risk`), no un color en línea, para
+que siga al esquema.
+
+### Alternativas descartadas
+
+En `design/temas/` quedan cuatro propuestas previas con esta misma paleta. La
+versión clara implementada corresponde a la lectura de `t1` (Lora en caja
+mixta). Si prefieres los titulares en versales con tracking ancho, está en
+`t3.css` y es un cambio de tres reglas.
+
 ## Proyectos (carrusel + modal)
 
 La sección **Proyectos** se dibuja a partir de `js/projects.js`, que expone un

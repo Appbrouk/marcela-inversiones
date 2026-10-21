@@ -5,26 +5,70 @@
 
 /* ---------- Tokens (design system) ---------- */
 :root{
-  --rose-300:#DEC3C4; --rose-400:#C8A0A0; --rose-500:#B0827F; --rose-600:#96676B;
-  --gold-300:#DCC494; --gold-400:#C8A868; --gold-500:#AA8A4B; --gold-600:#8C6F38;
-  --blush-50:#FFF5F2; --blush-100:#FFEAE6; --cream-50:#FBF7F1; --cream-100:#F6EFE4;
-  --ink-900:#191817; --ink-700:#3B3835; --ink-500:#6E6862; --ink-300:#A9A29B; --ink-150:#DDD6CF;
-  --white:#FFFFFF;
+  /* ---------- Marca (manual) · no cambian con el esquema ---------- */
+  --ciruela:#4A2530; --burdeo:#6B2A3C; --rosa-palo:#E4BEC0;
+  --rosa-antiguo:#B5707F; --dorado:#D4B07A; --blush:#FAF0EE;
 
-  --surface-page:var(--white); --surface-blush:var(--blush-100); --surface-cream:var(--cream-100);
-  --surface-card:var(--white);
-  --text-heading:var(--ink-900); --text-body:var(--ink-700); --text-muted:var(--ink-500);
-  --link:var(--rose-600); --link-hover:var(--rose-500);
-  --border-hairline:var(--ink-150); --focus-ring:var(--gold-400); --negative:#A9605C;
+  /* ---------- Semánticos · se redefinen en modo oscuro ----------
+     Las reglas del sitio solo usan estos nombres. Lo que cambia entre claro y
+     oscuro vive aquí y en el bloque @media del final de este archivo; ninguna
+     regla de componente necesita saber en qué esquema está. */
+  --surface-page:var(--blush);        /* fondo general */
+  --surface-raised:#FFFFFF;           /* tarjetas, paneles, campos */
+  --surface-sunken:#F6E7E4;           /* secciones alternas */
+  --surface-inverse:var(--ciruela);   /* franjas al revés del esquema */
+  --on-inverse:var(--blush);
 
-  --font-sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --display-weight:300; --display-tracking:0.18em; --label-tracking:0.32em;
+  --text-heading:var(--ciruela);
+  --text-body:#5C3B45;
+  --text-muted:#866771;
+  --text-faint:#8A6E76;
+
+  --border-hairline:#EADCDC;
+  --accent:var(--burdeo);             /* color de acción: botones */
+  --accent-hover:var(--ciruela);
+  --on-accent:var(--blush);           /* texto sobre el color de acción */
+  --accent-soft:var(--rosa-palo);     /* chips, marcas suaves */
+  --detail:var(--dorado);             /* filetes, marcos, detalle premium */
+  --detail-strong:#A8803F;            /* el dorado no contrasta sobre claro */
+
+  --link:var(--burdeo); --link-hover:var(--rosa-antiguo);
+  --focus-ring:var(--dorado); --negative:#8C3F3B;
+
+  /* Superficies translúcidas ("vidrio"): nav, menú, modal, botones flotantes */
+  --glass:rgba(255,255,255,.82);
+  --glass-nav:rgba(255,255,255,.74);
+  --glass-nav-solid:rgba(255,255,255,.96);
+  --glass-menu:rgba(255,234,230,.92);
+  --glass-border:rgba(255,255,255,.6);
+  --glow-soft:rgba(255,255,255,.75);
+  --hairline-soft:rgba(25,24,23,.08);
+  --veil:rgba(25,24,23,.5);
+
+  --shadow-card:0 1px 2px rgba(74,37,48,.05),0 8px 24px rgba(74,37,48,.07);
+  --shadow-lift:0 2px 4px rgba(74,37,48,.07),0 16px 40px rgba(74,37,48,.12);
+
+  /* ---------- Alias heredados ----------
+     El sitio se escribió con esta escala antes del manual de marca. Se mantienen
+     apuntando a los semánticos para no reescribir 700 reglas: así el modo oscuro
+     se obtiene redefiniendo un solo bloque. --ink-900 ya no significa "casi
+     negro" sino "el color de mayor contraste del esquema". */
+  --rose-300:var(--rosa-palo); --rose-400:#D9A8AC; --rose-500:var(--rosa-antiguo); --rose-600:var(--burdeo);
+  --gold-300:#E6CCA3; --gold-400:var(--dorado); --gold-500:var(--detail-strong); --gold-600:#8A6C3C;
+  --blush-50:#FFFBFA; --blush-100:var(--blush); --cream-50:#FDF8F5; --cream-100:var(--surface-sunken);
+  --ink-900:var(--text-heading); --ink-700:var(--text-body); --ink-500:var(--text-muted);
+  --ink-300:var(--text-faint); --ink-150:var(--border-hairline);
+  --white:var(--surface-raised);
+  --surface-blush:var(--blush-100); --surface-cream:var(--surface-sunken); --surface-card:var(--surface-raised);
+
+  /* ---------- Tipografía (manual: Lora títulos · Poppins textos) ---------- */
+  --font-sans:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-display:'Lora',Georgia,'Times New Roman',serif;
+  --display-weight:500; --display-tracking:.02em; --label-tracking:.28em;
 
   --container-max:1100px; --gutter:40px; --section-pad:96px;
 
   --radius-xs:2px; --radius-pill:999px;
-  --shadow-card:0 1px 2px rgba(25,24,23,.05),0 8px 24px rgba(25,24,23,.06);
-  --shadow-lift:0 2px 4px rgba(25,24,23,.06),0 16px 40px rgba(25,24,23,.10);
   --ease-brand:cubic-bezier(.25,.1,.25,1);
   --ease-out:cubic-bezier(.22,1,.36,1);        /* "Apple" ease para reveals */
   --dur-quick:150ms; --dur-gentle:300ms;
@@ -34,7 +78,7 @@
 
 /* ---------- Base ---------- */
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:var(--nav-h);-webkit-text-size-adjust:100%}
+html{color-scheme:light dark;scroll-behavior:smooth;scroll-padding-top:var(--nav-h);-webkit-text-size-adjust:100%}
 body{
   margin:0;font-family:var(--font-sans);font-size:16px;font-weight:400;line-height:1.55;
   color:var(--text-body);background:var(--surface-page);-webkit-font-smoothing:antialiased;
@@ -44,6 +88,7 @@ html.menu-open,html.intro-active{overflow:hidden}
 img{max-width:100%;height:auto;display:block}
 a{color:var(--link);text-decoration:none;transition:color var(--dur-quick) var(--ease-brand)}
 a:hover{color:var(--link-hover)}
+h1,h2,h3,h4{font-family:var(--font-display)}
 h1,h2,h3{margin:0;color:var(--text-heading);font-weight:var(--display-weight);line-height:1.15}
 p{margin:0}
 button{font:inherit}
@@ -59,7 +104,7 @@ button{font:inherit}
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ---------- Tipografía display ---------- */
-.display{font-weight:300;text-transform:uppercase;letter-spacing:.14em;line-height:1.25}
+.display{font-family:var(--font-display);font-weight:500;letter-spacing:.01em;line-height:1.25}
 .display--xl{font-size:clamp(30px,4.2vw,44px)}
 .display--lg{font-size:clamp(24px,3vw,30px);line-height:1.3}
 .display--md{font-size:clamp(20px,2.4vw,28px);letter-spacing:.16em;line-height:1.35}
@@ -81,7 +126,7 @@ button{font:inherit}
 .section-title{text-align:center;max-width:640px;margin:0 auto}
 .section-title .kicker{margin-bottom:16px;justify-content:center}
 .section-title .kicker__line{width:40px}
-.section-title h2{font-size:32px;font-weight:300;letter-spacing:var(--display-tracking);text-transform:uppercase}
+.section-title h2{font-size:32px;font-weight:500;letter-spacing:var(--display-tracking)}
 .section-title p{color:var(--text-muted);margin-top:16px}
 
 /* ---------- Botón (Button del DS + magnetismo y brillo) ---------- */
@@ -90,12 +135,12 @@ button{font:inherit}
   position:relative;display:inline-block;overflow:hidden;isolation:isolate;
   font-family:var(--font-sans);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;line-height:1.2;
   padding:12px 28px;border-radius:var(--radius-xs);border:1px solid transparent;
-  background:var(--ink-900);color:#fff;cursor:pointer;text-decoration:none;text-align:center;white-space:nowrap;
+  background:var(--accent);color:var(--on-accent);cursor:pointer;text-decoration:none;text-align:center;white-space:nowrap;
   transform:translate3d(var(--mx),var(--my),0);
   transition:background var(--dur-quick) var(--ease-brand),color var(--dur-quick) var(--ease-brand),
              border-color var(--dur-quick) var(--ease-brand),transform .6s var(--ease-out),opacity var(--dur-quick);
 }
-.btn:hover{background:var(--ink-700);color:#fff}
+.btn:hover{background:var(--accent-hover);color:var(--on-accent)}
 .btn::after{ /* brillo que recorre el botón */
   content:"";position:absolute;inset:-2px;pointer-events:none;
   background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);
@@ -105,7 +150,7 @@ button{font:inherit}
 .btn--sm{font-size:11px;padding:8px 18px}
 .btn--lg{padding:16px 40px}
 .btn--outline{background:transparent;border-color:var(--ink-900);color:var(--ink-900)}
-.btn--outline:hover{background:var(--ink-900);color:#fff}
+.btn--outline:hover{background:var(--text-heading);color:var(--surface-page)}
 .btn--outline::after{background:linear-gradient(115deg,transparent 35%,rgba(200,168,104,.28) 50%,transparent 65%)}
 .btn--ghost{background:transparent;color:var(--rose-600);padding-left:6px;padding-right:6px}
 .btn--ghost:hover{background:transparent;color:var(--rose-500)}
@@ -116,7 +161,7 @@ button{font:inherit}
 .btn.is-loading{color:transparent}
 .btn.is-loading::before{
   content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;
-  border:1.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;
+  border:1.5px solid rgba(255,255,255,.35);border-top-color:var(--on-accent);border-radius:50%;animation:spin .8s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -165,12 +210,12 @@ button{font:inherit}
              -webkit-backdrop-filter .5s,backdrop-filter .5s;
 }
 .nav.is-scrolled{
-  background:rgba(255,255,255,.74);
+  background:var(--glass-nav);
   -webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
   border-bottom-color:var(--border-hairline);
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset;
+  box-shadow:0 1px 0 var(--glass-border) inset;
 }
-@supports not (backdrop-filter:blur(1px)){.nav.is-scrolled{background:rgba(255,255,255,.96)}}
+@supports not (backdrop-filter:blur(1px)){.nav.is-scrolled{background:var(--glass-nav-solid)}}
 .nav__inner{
   display:flex;align-items:center;justify-content:space-between;gap:24px;
   padding:18px var(--gutter);transition:padding .5s var(--ease-out);
@@ -206,20 +251,20 @@ button{font:inherit}
 /* Menú móvil a pantalla completa */
 .menu{
   position:fixed;inset:0;z-index:55;display:flex;flex-direction:column;justify-content:center;
-  padding:120px var(--gutter) 48px;background:rgba(255,234,230,.92);
+  padding:120px var(--gutter) 48px;background:var(--glass-menu);
   -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
   opacity:0;visibility:hidden;transition:opacity .5s var(--ease-out),visibility .5s;
 }
 .menu.is-open{opacity:1;visibility:visible}
 .menu a{
-  display:block;padding:14px 0;border-bottom:1px solid rgba(25,24,23,.08);
+  display:block;padding:14px 0;border-bottom:1px solid var(--hairline-soft);
   font-size:clamp(22px,6vw,30px);font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-900);
   opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out);
   transition-delay:calc(var(--i,0)*60ms);
 }
 .menu.is-open a{opacity:1;transform:none}
-.menu a.btn{margin-top:32px;align-self:flex-start;padding:14px 32px;font-size:12px;letter-spacing:.2em;font-weight:500;color:#fff;border-bottom:0}
-.menu a.btn:hover{color:#fff}
+.menu a.btn{margin-top:32px;align-self:flex-start;padding:14px 32px;font-size:12px;letter-spacing:.2em;font-weight:500;color:var(--on-accent);border-bottom:0}
+.menu a.btn:hover{color:var(--on-accent)}
 .menu__contact{margin-top:auto;font-size:12px;letter-spacing:.08em;color:var(--ink-500)}
 
 /* ---------- Sistema de reveals al hacer scroll ----------
@@ -267,7 +312,7 @@ button{font:inherit}
 .in .w>span{transform:none}
 
 /* ---------- Hero ---------- */
-.hero{position:relative;background:#fff;overflow:hidden}
+.hero{position:relative;background:var(--surface-page);overflow:hidden}
 .hero__grid{
   display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:end;
   padding-top:calc(var(--nav-h) + 56px);
@@ -304,7 +349,7 @@ button{font:inherit}
 .strip::before{
   content:"";position:absolute;width:60vw;height:60vw;max-width:720px;max-height:720px;left:50%;top:50%;
   transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
-  background:radial-gradient(closest-side,rgba(255,255,255,.75),transparent);
+  background:radial-gradient(closest-side,var(--glow-soft),transparent);
   animation:drift 14s ease-in-out infinite alternate;
 }
 @keyframes drift{from{transform:translate(-60%,-55%) scale(1)}to{transform:translate(-40%,-45%) scale(1.15)}}
@@ -346,7 +391,7 @@ button{font:inherit}
 
 /* ---------- eBooks ---------- */
 .ebook{
-  display:grid;grid-template-columns:170px 1fr;background:#fff;border:1px solid var(--border-hairline);
+  display:grid;grid-template-columns:170px 1fr;background:var(--surface-raised);border:1px solid var(--border-hairline);
   box-shadow:var(--shadow-card);transition:box-shadow .6s var(--ease-out),transform .6s var(--ease-out);
 }
 .ebook:hover{box-shadow:var(--shadow-lift);transform:translateY(-4px)}
@@ -358,13 +403,13 @@ button{font:inherit}
 }
 .ebook:hover .book{transform:rotateY(-8deg) rotateX(0deg) translateY(-4px)}
 .book__cover{
-  position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;justify-content:space-between;
+  position:absolute;inset:0;background:var(--surface-raised);display:flex;flex-direction:column;justify-content:space-between;
   padding:12px 12px 10px;border-radius:1px 3px 3px 1px;
   box-shadow:14px 18px 34px rgba(25,24,23,.18),0 0 0 1px rgba(25,24,23,.06) inset;
 }
-.book__cover::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:1px;background:rgba(25,24,23,.08)}
+.book__cover::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:1px;background:var(--hairline-soft)}
 .book__spine{position:absolute;left:0;top:0;bottom:0;width:10px;transform-origin:left;transform:rotateY(90deg) translateX(-10px);background:var(--ink-900);opacity:.85}
-.book__pages{position:absolute;right:-3px;top:2px;bottom:2px;width:3px;background:repeating-linear-gradient(to bottom,#fff 0 1px,#e9e2d8 1px 2px)}
+.book__pages{position:absolute;right:-3px;top:2px;bottom:2px;width:3px;background:repeating-linear-gradient(to bottom,var(--surface-raised) 0 1px,var(--border-hairline) 1px 2px)}
 .book__band{height:44%;margin:-12px -12px 0;background:var(--rose-400);position:relative}
 .book--gold .book__band{background:var(--gold-400)}
 .book__band svg{position:absolute;right:10px;bottom:8px;width:22px;height:auto}
@@ -377,7 +422,7 @@ button{font:inherit}
 
 /* ---------- Proyectos ---------- */
 .project{
-  background:#fff;border:1px solid var(--border-hairline);box-shadow:var(--shadow-card);
+  background:var(--surface-raised);border:1px solid var(--border-hairline);box-shadow:var(--shadow-card);
   transition:box-shadow .6s var(--ease-out),transform .6s var(--ease-out);
 }
 .project:hover{box-shadow:var(--shadow-lift);transform:translateY(-4px)}
@@ -410,7 +455,7 @@ button{font:inherit}
 
 /* ---------- Sobre mí ---------- */
 .about{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center}
-.frame{position:relative;border:1px solid var(--border-hairline);padding:16px;background:#fff}
+.frame{position:relative;border:1px solid var(--border-hairline);padding:16px;background:var(--surface-raised)}
 .frame::before{ /* marco fantasma que se desplaza — profundidad */
   content:"";position:absolute;inset:14px -14px -14px 14px;border:1px solid var(--gold-300);z-index:-1;
   transform:translate3d(calc(var(--py,0px) * -.35),calc(var(--py,0px) * .35),0);
@@ -430,13 +475,13 @@ button{font:inherit}
 .register__copy .kicker{margin-bottom:24px}
 .register__copy .kicker .kicker__line:last-child{display:none}
 .register__copy p{margin-top:24px;color:var(--ink-700);max-width:420px}
-.panel{position:relative;background:#fff;border:1px solid var(--border-hairline);padding:40px;box-shadow:var(--shadow-card)}
+.panel{position:relative;background:var(--surface-raised);border:1px solid var(--border-hairline);padding:40px;box-shadow:var(--shadow-card)}
 .form{display:flex;flex-direction:column;gap:18px}
 .field{display:block}
 .field__label{display:block;font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-700);margin-bottom:8px}
 .field__control{position:relative}
 .field input{
-  width:100%;font-family:var(--font-sans);font-size:15px;color:var(--ink-900);padding:12px 14px;background:#fff;
+  width:100%;font-family:var(--font-sans);font-size:15px;color:var(--ink-900);padding:12px 14px;background:var(--surface-raised);
   border:1px solid var(--border-hairline);border-radius:var(--radius-xs);outline:none;
   transition:border-color var(--dur-quick) var(--ease-brand);
 }
@@ -452,11 +497,11 @@ button{font:inherit}
 .check{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;color:var(--ink-700);user-select:none}
 .check input{position:absolute;opacity:0;width:0;height:0}
 .check__box{
-  width:16px;height:16px;flex:none;border:1px solid var(--ink-300);background:#fff;border-radius:var(--radius-xs);
+  width:16px;height:16px;flex:none;border:1px solid var(--text-faint);background:var(--surface-raised);border-radius:var(--radius-xs);
   display:grid;place-items:center;transition:background var(--dur-quick) var(--ease-brand),border-color var(--dur-quick) var(--ease-brand);
 }
 .check__box svg{width:10px;height:8px;overflow:visible}
-.check__box path{stroke:#fff;stroke-width:1.5;fill:none;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .4s var(--ease-out)}
+.check__box path{stroke:var(--on-accent);stroke-width:1.5;fill:none;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .4s var(--ease-out)}
 .check input:checked~.check__box{background:var(--rose-400);border-color:var(--rose-500)}
 .check input:checked~.check__box path{stroke-dashoffset:0}
 .check input:focus-visible~.check__box{outline:2px solid var(--focus-ring);outline-offset:2px}
@@ -499,12 +544,12 @@ button{font:inherit}
 }
 .to-top{
   position:fixed;right:24px;bottom:24px;z-index:50;width:44px;height:44px;display:grid;place-items:center;
-  background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
   border:1px solid var(--border-hairline);border-radius:var(--radius-xs);color:var(--ink-900);cursor:pointer;
   opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease-out),transform .5s var(--ease-out),background .3s;
 }
 .to-top.is-visible{opacity:1;transform:none}
-.to-top:hover{background:#fff}
+.to-top:hover{background:var(--surface-raised)}
 .to-top svg{width:16px;height:16px}
 
 /* ---------- Carrusel de proyectos ----------
@@ -553,12 +598,12 @@ button{font:inherit}
 .carousel__nav{display:flex;gap:10px}
 .carousel__btn{
   width:44px;height:44px;display:grid;place-items:center;padding:0;
-  background:rgba(255,255,255,.8);border:1px solid var(--border-hairline);border-radius:var(--radius-xs);
+  background:var(--glass);border:1px solid var(--border-hairline);border-radius:var(--radius-xs);
   color:var(--ink-900);cursor:pointer;
   transition:background .3s,border-color .3s,color .3s,opacity .3s,transform .5s var(--ease-out);
 }
 .carousel__btn svg{width:16px;height:16px}
-.carousel__btn:hover{background:#fff;border-color:var(--rose-400);color:var(--rose-600)}
+.carousel__btn:hover{background:var(--surface-raised);border-color:var(--rose-400);color:var(--rose-600)}
 .carousel__btn:active{transform:scale(.94)}
 .carousel__btn[disabled]{opacity:.3;cursor:default;pointer-events:none}
 .carousel__noscript{margin-top:24px;font-size:14px;color:var(--ink-500);text-align:center}
@@ -571,7 +616,7 @@ button{font:inherit}
 .project__index{
   position:absolute;left:16px;top:14px;z-index:1;
   font-size:10px;font-weight:500;letter-spacing:.28em;color:var(--ink-700);line-height:1;
-  padding:6px 10px 5px;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  padding:6px 10px 5px;background:var(--glass);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   transition:none!important;
 }
 .project__body{display:flex;flex-direction:column;flex:1}
@@ -592,14 +637,14 @@ button{font:inherit}
   --modal-h:min(92vh,860px);
   position:fixed;inset:0;margin:auto;padding:0;
   width:min(1040px,calc(100% - 32px));max-width:none;height:fit-content;max-height:var(--modal-h);
-  border:1px solid var(--border-hairline);background:#fff;color:var(--text-body);
+  border:1px solid var(--border-hairline);background:var(--surface-raised);color:var(--text-body);
   box-shadow:var(--shadow-lift);overflow:visible;
   opacity:0;translate:0 24px;scale:.985;
   transition:opacity .45s var(--ease-out),translate .6s var(--ease-out),scale .6s var(--ease-out);
 }
 .modal.is-open{opacity:1;translate:none;scale:none}
 .modal::backdrop{
-  background:rgba(25,24,23,.5);
+  background:var(--veil);
   -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   opacity:0;transition:opacity .45s var(--ease-out);
 }
@@ -613,12 +658,12 @@ html.modal-open{overflow:hidden}
 }
 .modal__close{
   position:absolute;right:16px;top:16px;z-index:3;width:44px;height:44px;display:grid;place-items:center;padding:0;
-  background:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   border:1px solid var(--border-hairline);border-radius:var(--radius-xs);color:var(--ink-900);cursor:pointer;
   transition:background .3s,border-color .3s,color .3s,transform .5s var(--ease-out);
 }
 .modal__close svg{width:16px;height:16px}
-.modal__close:hover{background:#fff;border-color:var(--rose-400);color:var(--rose-600);transform:rotate(90deg)}
+.modal__close:hover{background:var(--surface-raised);border-color:var(--rose-400);color:var(--rose-600);transform:rotate(90deg)}
 
 .modal__body{
   padding:48px 44px 40px;overflow-y:auto;min-height:min(560px,calc(var(--modal-h) - 2px));
@@ -650,12 +695,12 @@ html.modal-open{overflow:hidden}
 .gallery__item.ph{position:relative;display:grid}
 .gallery__btn{
   position:absolute;top:50%;translate:0 -50%;z-index:2;width:44px;height:44px;display:grid;place-items:center;padding:0;
-  background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.6);border-radius:var(--radius-xs);color:var(--ink-900);cursor:pointer;
+  background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);border-radius:var(--radius-xs);color:var(--ink-900);cursor:pointer;
   transition:background .3s,color .3s,opacity .3s;
 }
 .gallery__btn svg{width:16px;height:16px}
-.gallery__btn:hover{background:#fff;color:var(--rose-600)}
+.gallery__btn:hover{background:var(--surface-raised);color:var(--rose-600)}
 .gallery__btn--prev{left:16px}
 .gallery__btn--next{right:16px}
 .gallery__btn[disabled]{opacity:.3;pointer-events:none}
@@ -664,14 +709,14 @@ html.modal-open{overflow:hidden}
   padding:14px 16px;pointer-events:none;
   background:linear-gradient(to top,rgba(25,24,23,.45),transparent);
 }
-.gallery__count{font-size:11px;font-weight:500;letter-spacing:.28em;color:#fff;font-variant-numeric:tabular-nums}
+.gallery__count{font-size:11px;font-weight:500;letter-spacing:.28em;color:#FFFFFF;font-variant-numeric:tabular-nums}
 .gallery__thumbs{display:flex;gap:6px;pointer-events:auto}
 .gallery__thumbs button{
-  width:48px;height:36px;padding:0;border:1px solid rgba(255,255,255,.5);background:var(--cream-100);cursor:pointer;overflow:hidden;
+  width:48px;height:36px;padding:0;border:1px solid var(--glass-border);background:var(--cream-100);cursor:pointer;overflow:hidden;
   opacity:.65;transition:opacity .3s,border-color .3s;
 }
 .gallery__thumbs button img{width:100%;height:100%;object-fit:cover}
-.gallery__thumbs button:hover,.gallery__thumbs button.is-active{opacity:1;border-color:#fff}
+.gallery__thumbs button:hover,.gallery__thumbs button.is-active{opacity:1;border-color:#FFFFFF}
 .gallery.is-single .gallery__btn,.gallery.is-single .gallery__foot{display:none}
 
 @media (max-width:760px){
@@ -742,4 +787,72 @@ html.modal-open{overflow:hidden}
   .hero__img,.frame img,.final__img{transform:none!important}
   .tilt{transform:none!important}
   .btn{transform:none!important}
+}
+
+/* ==========================================================================
+   Modo oscuro — sigue la preferencia del dispositivo
+   ==========================================================================
+   Solo se redefinen tokens: ninguna regla de componente se duplica. El mapeo no
+   va por el nombre del alias sino por su uso real — rose-600 y gold-600 solo
+   aparecen como texto, así que aquí se aclaran; rose-300 y gold-400 son fondos
+   y se oscurecen. --ciruela, --blush y el resto de la marca no cambian nunca.
+   ========================================================================== */
+@media (prefers-color-scheme: dark){
+  :root{
+    --surface-page:var(--ciruela);
+    --surface-raised:#5B3240;        /* por encima del fondo, para que las tarjetas levanten */
+    --surface-sunken:#3B1D27;
+    --surface-inverse:var(--blush);  /* se invierte: la franja clara sobre página oscura */
+    --on-inverse:var(--ciruela);
+
+    --text-heading:var(--blush);
+    --text-body:#E6D2D4;
+    --text-muted:#C3A6AC;
+    --text-faint:#BFA3AA;
+
+    --border-hairline:#6E4654;
+    --accent:var(--dorado);          /* sobre ciruela el dorado manda mejor que el burdeo */
+    --accent-hover:var(--rosa-palo);
+    --on-accent:var(--ciruela);
+    --accent-soft:var(--burdeo);
+    --detail:var(--dorado);
+    --detail-strong:var(--dorado);   /* sobre oscuro ya contrasta, no hace falta apagarlo */
+
+    --link:var(--rosa-palo); --link-hover:var(--dorado);
+    --focus-ring:var(--dorado); --negative:#E8A49F;
+
+    /* La sombra apenas se ve sobre oscuro: el relieve lo da el borde */
+    --shadow-card:0 1px 2px rgba(0,0,0,.28),0 8px 24px rgba(0,0,0,.22);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.3);
+
+    /* Alias heredados, remapeados por uso */
+    --rose-300:var(--burdeo);        /* fondo de ::selection y marcas suaves */
+    --rose-400:#C98F98;              /* mixto: fondo, texto y borde */
+    --rose-500:#DCB2B6;              /* texto */
+    --rose-600:var(--rosa-palo);     /* texto y enlaces */
+    --gold-300:#8A6C3C; --gold-400:var(--dorado);
+    --gold-500:var(--dorado); --gold-600:#EBD4AC;   /* ambos solo texto */
+    --blush-50:#40212C; --blush-100:#452430;
+    --cream-50:#43222D;
+
+    --glass:rgba(91,50,64,.86);
+    --glass-nav:rgba(74,37,48,.82);
+    --glass-nav-solid:rgba(74,37,48,.97);
+    --glass-menu:rgba(58,28,38,.96);
+    --glass-border:rgba(250,240,238,.18);
+    --glow-soft:rgba(228,190,192,.1);
+    --hairline-soft:rgba(250,240,238,.12);
+    --veil:rgba(20,8,12,.72);
+  }
+
+  /* El brillo radial del héroe es crema: sobre oscuro se vuelve una mancha */
+  .hero__glow{opacity:.18;filter:saturate(.6)}
+
+  /* El logo lleva el texto en oscuro; en modo oscuro va la versión del manual
+     con el texto en blush y el isotipo intacto en rosa y dorado. */
+  .nav__logo img,.footer__logo{content:url(../assets/logo-lockup-dark.png)}
+  .footer__logo{content:url(../assets/logo-wordmark-dark.png)}
+
+  /* Las fotos de producto se ven duras a plena luminancia sobre fondo oscuro */
+  .hero__img,.frame__clip img,.final__img{filter:brightness(.92) contrast(1.02)}
 }

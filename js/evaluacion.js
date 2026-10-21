@@ -524,7 +524,8 @@
     d.getElementById('diag-carga-label').textContent = 'Carga financiera actual: ' + Math.round(carga * 100) + '% de tu renta';
     var meter = d.getElementById('diag-meter');
     meter.style.width = Math.min(100, carga / CFG.CARGA_MAX * 100) + '%';
-    meter.style.backgroundColor = carga <= 0.2 ? '#4E8D6E' : carga <= 0.35 ? '#C8A868' : '#A9605C';
+    /* El color lo decide el CSS vía clase, para que siga al esquema claro/oscuro */
+    meter.className = carga <= 0.2 ? 'is-ok' : carga <= 0.35 ? 'is-warn' : 'is-risk';
     d.getElementById('diag-renta').textContent = clp(rentaTotal);
     d.getElementById('diag-div').textContent = clp(dividendo);
     d.getElementById('diag-credito').textContent = ufFmt(creditoUF);

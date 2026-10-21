@@ -1,3 +1,18 @@
+:root{
+  /* Semáforo del pre-diagnóstico. Vive aquí y no en el JS para que siga al
+     esquema de color; el medidor recibe una clase, no un color en línea. */
+  --estado-ok-bg:#E4F0E9;  --estado-ok-fg:#2F6B4F;
+  --estado-warn-bg:#F6EBD9; --estado-warn-fg:#8A6C3C;
+  --estado-risk-bg:#F7E2E1; --estado-risk-fg:#8C3F3B;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --estado-ok-bg:#2A4335;  --estado-ok-fg:#8FCBA9;
+    --estado-warn-bg:#4A3826; --estado-warn-fg:#E2C390;
+    --estado-risk-bg:#53272C; --estado-risk-fg:#E8A49F;
+  }
+}
+
 /* ==========================================================================
    Marcela Díaz Inversiones — evaluador de perfil
    Extiende los tokens y componentes de styles.css (.btn, .panel, .badge,
@@ -40,7 +55,7 @@
 }
 .progress-steps li::before{
   content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:16px;height:16px;border-radius:50%;border:1px solid var(--border-hairline);background:#fff;
+  width:16px;height:16px;border-radius:50%;border:1px solid var(--border-hairline);background:var(--surface-raised);
   transition:background var(--dur-gentle) var(--ease-brand),border-color var(--dur-gentle) var(--ease-brand);
 }
 .progress-steps .is-current{color:var(--ink-900);font-weight:500}
@@ -49,7 +64,7 @@
 .progress-steps .is-done::before{border-color:var(--gold-400);background:var(--gold-400)}
 .progress-steps .is-done::after{ /* check del paso ya completado */
   content:"";position:absolute;left:5px;top:calc(50% - 4px);width:4px;height:7px;
-  border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg);
+  border:solid var(--on-accent);border-width:0 1.5px 1.5px 0;transform:rotate(45deg);
 }
 
 /* ---------- Pasos ---------- */
@@ -72,7 +87,7 @@
 .eval .field__opt{text-transform:none;letter-spacing:0;color:var(--ink-300);font-weight:400}
 .eval .field input,.eval .field select,.eval .field textarea{
   width:100%;font-family:var(--font-sans);font-size:15px;font-weight:400;letter-spacing:0;text-transform:none;
-  color:var(--ink-900);padding:12px 14px;background:#fff;
+  color:var(--ink-900);padding:12px 14px;background:var(--surface-raised);
   border:1px solid var(--border-hairline);border-radius:var(--radius-xs);outline:none;
   transition:border-color var(--dur-quick) var(--ease-brand);
 }
@@ -90,7 +105,7 @@
 .choice{position:relative;cursor:pointer}
 .choice input{position:absolute;opacity:0;width:0;height:0}
 .choice span{
-  display:block;padding:10px 18px;font-size:14px;color:var(--ink-700);background:#fff;
+  display:block;padding:10px 18px;font-size:14px;color:var(--text-body);background:var(--surface-raised);
   border:1px solid var(--border-hairline);border-radius:var(--radius-pill);
   transition:border-color var(--dur-quick) var(--ease-brand),background var(--dur-quick) var(--ease-brand),
              color var(--dur-quick) var(--ease-brand);
@@ -164,7 +179,7 @@
 /* ---------- Panel de pre-diagnóstico ---------- */
 .diag{
   position:sticky;top:calc(var(--nav-h) + 24px);
-  background:#fff;border:1px solid var(--border-hairline);padding:28px;box-shadow:var(--shadow-card);
+  background:var(--surface-raised);border:1px solid var(--border-hairline);padding:28px;box-shadow:var(--shadow-card);
 }
 .diag__kicker{justify-content:flex-start;margin-bottom:18px;letter-spacing:.2em}
 .diag__kicker .kicker__line{display:none} /* en 340px la línea obliga al texto a partirse */
@@ -174,9 +189,9 @@
   justify-self:start;padding:6px 14px;border-radius:var(--radius-pill);
   font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
 }
-.diag__status--ok{background:#E7F2EC;color:#2F6B4F}
-.diag__status--warn{background:var(--cream-100);color:var(--gold-600)}
-.diag__status--risk{background:var(--blush-100);color:#8C3F3B}
+.diag__status--ok{background:var(--estado-ok-bg);color:var(--estado-ok-fg)}
+.diag__status--warn{background:var(--estado-warn-bg);color:var(--estado-warn-fg)}
+.diag__status--risk{background:var(--estado-risk-bg);color:var(--estado-risk-fg)}
 .diag__label{font-size:12px;color:var(--ink-500);line-height:1.5}
 .diag__big{font-size:32px;font-weight:300;letter-spacing:.04em;color:var(--ink-900);margin:4px 0 2px}
 .diag__row{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--ink-500);
@@ -184,14 +199,17 @@
 .diag__row strong{color:var(--ink-900);font-weight:500;white-space:nowrap}
 
 .meter{height:6px;margin-top:8px;background:var(--ink-150);border-radius:var(--radius-pill);overflow:hidden}
+.meter span.is-ok{background:var(--estado-ok-fg)}
+.meter span.is-warn{background:var(--estado-warn-fg)}
+.meter span.is-risk{background:var(--estado-risk-fg)}
 .meter span{display:block;height:100%;width:0;border-radius:var(--radius-pill);
   transition:width .5s var(--ease-out),background-color .5s var(--ease-brand)}
 
 .flags{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 .flags li{position:relative;padding-left:20px;font-size:13px;line-height:1.5;color:var(--ink-700)}
 .flags li::before{position:absolute;left:0;top:0;font-weight:500}
-.flags .ok::before{content:"✓";color:#4E8D6E}
-.flags .warn::before{content:"!";color:var(--gold-600)}
+.flags .ok::before{content:"✓";color:var(--estado-ok-fg)}
+.flags .warn::before{content:"!";color:var(--estado-warn-fg)}
 
 .diag__matches{display:grid;gap:8px}
 .diag__matches a{
@@ -207,7 +225,7 @@
 .diag-mini{
   position:fixed;left:0;right:0;bottom:0;z-index:40;
   display:none;align-items:center;justify-content:space-between;gap:12px;
-  padding:14px 20px;background:var(--ink-900);color:#fff;
+  padding:14px 20px;background:var(--surface-inverse);color:var(--on-inverse);
   transform:translateY(100%);transition:transform .4s var(--ease-out);
 }
 .diag-mini span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
