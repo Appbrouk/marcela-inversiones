@@ -1,0 +1,9 @@
+:root{
+  --ciruela:#4A2530; --burdeo:#6B2A3C; --rosa-palo:#E4BEC0;
+  --rosa-antiguo:#B5707F; --dorado:#D4B07A; --blush:#FAF0EE;
+  --font-sans:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-display:'Lora',Georgia,serif;
+  --negative:#8C3F3B;
+}
+body,.btn,.field input,.field select,.field textarea,button{font-family:var(--font-sans)}
+h1,h2,h3,h4,.display,.section-title h2,.step__title,.diag__big{font-family:var(--font-display)}

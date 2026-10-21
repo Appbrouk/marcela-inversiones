@@ -1,0 +1,12 @@
+:root{
+  --rose-300:var(--rosa-palo); --rose-400:var(--rosa-antiguo); --rose-500:var(--burdeo); --rose-600:var(--burdeo);
+  --gold-300:#E6CCA3; --gold-400:var(--dorado); --gold-500:#A8803F; --gold-600:#8A6C3C;
+  --blush-50:#FFFBFA; --blush-100:#F7E2E3; --cream-50:#FBF4EF; --cream-100:#F2E6DA;
+  --ink-900:var(--ciruela); --ink-700:#50303A; --ink-500:#7D626B; --ink-300:#AE969D; --ink-150:#E3D3D4;
+  --display-weight:400; --display-tracking:.12em;
+}
+/* Conserva versales y tracking del sitio actual, solo que en Lora */
+.display,.section-title h2{font-weight:400}
+.btn:not(.btn--outline):not(.btn--ghost){background:var(--burdeo)} .btn:not(.btn--outline):not(.btn--ghost):hover{background:var(--ciruela)}
+.badge--rose{background:var(--rosa-palo);color:var(--ciruela)}
+.kicker{color:var(--burdeo)}

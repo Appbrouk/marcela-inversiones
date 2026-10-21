@@ -1,0 +1,34 @@
+:root{
+  --rose-300:var(--rosa-palo); --rose-400:#D9A8AC; --rose-500:var(--rosa-antiguo); --rose-600:var(--burdeo);
+  --gold-300:#E6CCA3; --gold-400:var(--dorado); --gold-500:#A8803F; --gold-600:#8A6C3C;
+  --blush-50:var(--blush); --blush-100:#F7E6E4; --cream-50:#FDF7F4; --cream-100:#F7EAE6;
+  --ink-900:var(--ciruela); --ink-700:#5C3B45; --ink-500:#866771; --ink-300:#B9A1A7; --ink-150:#EADCDC;
+  --display-weight:400; --display-tracking:.04em;
+}
+.display,.section-title h2,.strip h2,.final h2{text-transform:none;letter-spacing:.01em;font-weight:500}
+.btn:not(.btn--outline):not(.btn--ghost){background:var(--burdeo)} .btn:not(.btn--outline):not(.btn--ghost):hover{background:var(--ciruela)}
+
+/* Secciones oscuras alternadas con las claras: la proporción 60% del manual sin
+   encadenar dos oscuras seguidas, que se empastan. */
+.hero,#sobre-mi,.final,.footer{background:var(--ciruela)!important;color:var(--blush)}
+.hero h1,#sobre-mi h2,.final h2,.footer h4{color:var(--blush)}
+.hero .lead,#sobre-mi p,.final p,.footer,.footer a{color:#E8D5D6}
+.hero__sign,.about__copy .muted{color:var(--rosa-palo)}
+.hero .kicker,#sobre-mi .kicker{color:var(--dorado)}
+.hero .kicker__line,#sobre-mi .kicker__line{background:rgba(228,190,192,.45)}
+
+/* La nav es transparente arriba: sobre el héroe ciruela sus enlaces desaparecían */
+.nav:not(.is-scrolled) .nav__links a,.nav:not(.is-scrolled) .nav__burger span{color:#E8D5D6}
+.nav:not(.is-scrolled) .nav__burger span{background:#E8D5D6}
+.nav:not(.is-scrolled) .nav__cta{background:var(--dorado);color:var(--ciruela)}
+.nav:not(.is-scrolled) .nav__logo img{filter:brightness(0) invert(1) opacity(.92)}
+
+/* Botones sobre fondo oscuro */
+.hero .btn:not(.btn--outline):not(.btn--ghost),.final .btn:not(.btn--outline):not(.btn--ghost){background:var(--dorado);color:var(--ciruela)}
+.hero .btn:not(.btn--outline):not(.btn--ghost):hover,.final .btn:not(.btn--outline):not(.btn--ghost):hover{background:var(--rosa-palo);color:var(--ciruela)}
+.hero .btn--outline,.final .btn--ghost,#sobre-mi .btn--ghost{background:transparent;border-color:var(--dorado);color:var(--dorado)}
+.hero .btn--outline:hover,.final .btn--ghost:hover,#sobre-mi .btn--ghost:hover{background:var(--dorado);color:var(--ciruela)}
+#sobre-mi .btn:not(.btn--outline):not(.btn--ghost){background:var(--dorado);color:var(--ciruela)}
+.frame{border-color:rgba(212,176,122,.4)}
+.footer__bottom{border-top-color:rgba(228,190,192,.22)}
+.hero__scroll{color:var(--rosa-palo)}

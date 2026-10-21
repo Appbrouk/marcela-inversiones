@@ -1,0 +1,12 @@
+:root{
+  --rose-300:#F2DCDD; --rose-400:var(--rosa-palo); --rose-500:var(--rosa-antiguo); --rose-600:var(--rosa-antiguo);
+  --gold-300:#EBD8BC; --gold-400:#DEC093; --gold-500:var(--dorado); --gold-600:#B08C52;
+  --blush-50:#FFFCFB; --blush-100:var(--blush); --cream-50:#FFF8F6; --cream-100:#FBEDEA;
+  --ink-900:var(--ciruela); --ink-700:#6B4953; --ink-500:#96777F; --ink-300:#A8878F; --ink-150:#F0E2E2;
+  --display-weight:400; --display-tracking:.02em;
+}
+.display,.section-title h2,.strip h2,.final h2{text-transform:none;letter-spacing:0;font-weight:400}
+.btn:not(.btn--outline):not(.btn--ghost){background:var(--rosa-antiguo)} .btn:not(.btn--outline):not(.btn--ghost):hover{background:var(--burdeo)}
+.btn--outline{border-color:var(--rosa-antiguo);color:var(--rosa-antiguo)}
+.badge--rose{background:var(--rosa-palo);color:var(--ciruela)}
+.kicker{color:var(--rosa-antiguo)}
