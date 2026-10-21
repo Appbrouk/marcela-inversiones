@@ -80,6 +80,34 @@ Todo vive en tokens, al inicio de `css/styles.css`:
 necesitas escribir una regla dentro del `@media` oscuro, probablemente falte un
 token.
 
+### Ritmo de secciones
+
+Antes blush, cream y blanco estaban a dos o tres puntos de luminancia: las
+secciones no se distinguían. Ahora hay cinco tonos separados de verdad más dos
+anclas oscuras que cortan la página:
+
+| Sección | Clase | Claro | Oscuro |
+|---|---|---|---|
+| Hero | — | Blush | Ciruela |
+| Evaluador | `bg-tint` | Rosa claro | Ciruela clara |
+| Servicios | `bg-cream` | Crema | Ciruela tostada |
+| Recursos | `bg-base` | Blush | Ciruela |
+| Proyectos | `bg-rose` | Rosa palo | Ciruela rosada |
+| Sobre mí | `bg-anchor` | **Ciruela** | Ciruela profunda |
+| Registro | `bg-tint` | Rosa claro | Ciruela clara |
+| Cierre | `bg-accent` | **Burdeo** | Burdeo |
+| Footer | — | **Ciruela** | Ciruela profunda |
+
+En claro las anclas son oscuras y cortan la página. En oscuro no se usan
+secciones claras —un bloque blush a media página deslumbra—: la diferenciación
+va por matices de ciruela y burdeo.
+
+**`.bg-anchor`, `.bg-accent` y `.footer` redefinen los tokens de texto como
+variables locales.** Como las custom properties cascadean, todo lo que hay
+dentro (titulares, párrafos, filetes, botones, tarjetas) se adapta solo. Si
+añades una sección oscura, dale una de esas clases en vez de escribir reglas de
+color: no debería hacer falta ninguna.
+
 ### Reglas al tocar colores
 
 1. **Nunca pongas un color literal en una regla.** Un `#fff` en el fondo de una

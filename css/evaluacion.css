@@ -20,7 +20,7 @@
    en ambas páginas vive en styles.css.
    ========================================================================== */
 
-.eval-page{background:var(--cream-50)}
+.eval-page{background:var(--sec-base)}
 
 /* Incrustado en la portada: .section-title lo limita a 640px y la lista de
    garantías parte 2+1. Un poco más de ancho la deja en una línea. */

@@ -30,10 +30,34 @@
   --on-accent:var(--blush);           /* texto sobre el color de acción */
   --accent-soft:var(--rosa-palo);     /* chips, marcas suaves */
   --detail:var(--dorado);             /* filetes, marcos, detalle premium */
-  --detail-strong:#A8803F;            /* el dorado no contrasta sobre claro */
+  --detail-strong:#87682F;            /* el dorado de marca no contrasta como texto sobre claro */
 
   --link:var(--burdeo); --link-hover:var(--rosa-antiguo);
   --focus-ring:var(--dorado); --negative:#8C3F3B;
+
+  /* ---------- Ritmo de secciones ----------
+     Antes blush, cream y blanco estaban a dos o tres puntos de luminancia: las
+     secciones no se distinguían. Ahora hay cinco tonos separados de verdad, más
+     dos anclas oscuras que cortan la página. La proporción sigue al manual: la
+     mayoría en claro, el rosa como acento y el dorado solo en filetes. */
+  --sec-base:var(--blush);
+  --sec-cream:#F7EBE2;
+  --sec-tint:#F7E2E3;
+  --sec-rose:#EFD3D6;
+  --sec-anchor:var(--ciruela);
+  --sec-accent:var(--burdeo);
+
+  /* Valores que toman las secciones ancla (oscuras sobre página clara).
+     Al redefinirse como variables locales, todo lo que hay dentro se adapta
+     solo: no hace falta una regla por elemento. */
+  --anchor-heading:var(--blush);
+  --anchor-body:#E6D2D4;
+  --anchor-muted:#C3A6AC;
+  --anchor-faint:#A5888F;
+  --anchor-hairline:rgba(250,240,238,.2);
+  --anchor-raised:#5B3240;
+  --anchor-accent:var(--dorado);
+  --anchor-on-accent:var(--ciruela);
 
   /* Superficies translúcidas ("vidrio"): nav, menú, modal, botones flotantes */
   --glass:rgba(255,255,255,.82);
@@ -99,8 +123,38 @@ button{font:inherit}
 .container{max-width:var(--container-max);margin:0 auto;padding:0 var(--gutter)}
 .section{padding:var(--section-pad) 0}
 .bg-white{background:var(--white)}
-.bg-blush{background:var(--surface-blush)}
-.bg-cream{background:var(--surface-cream)}
+.bg-base{background:var(--sec-base)}
+.bg-blush,.bg-tint{background:var(--sec-tint)}
+.bg-cream{background:var(--sec-cream)}
+.bg-rose{background:var(--sec-rose)}
+
+/* Secciones ancla: cortan la página en oscuro. Redefinen los tokens de texto
+   como variables locales, así que titulares, párrafos, filetes, botones y
+   tarjetas de dentro se adaptan sin una sola regla extra. */
+.bg-anchor,.bg-accent,.footer{
+  --text-heading:var(--anchor-heading);
+  --text-body:var(--anchor-body);
+  --text-muted:var(--anchor-muted);
+  --text-faint:var(--anchor-faint);
+  --border-hairline:var(--anchor-hairline);
+  --surface-raised:var(--anchor-raised);
+  --accent:var(--anchor-accent);
+  --accent-hover:var(--rosa-palo);
+  --on-accent:var(--anchor-on-accent);
+  --ink-900:var(--anchor-heading); --ink-700:var(--anchor-body);
+  --ink-500:var(--anchor-muted);   --ink-300:var(--anchor-faint);
+  --ink-150:var(--anchor-hairline);
+  --rose-600:var(--rosa-palo); --rose-500:#DCB2B6;
+  --gold-500:var(--dorado); --gold-600:#EBD4AC;
+  --glass:rgba(91,50,64,.86); --glass-border:rgba(250,240,238,.18);
+  --hairline-soft:rgba(250,240,238,.12);
+  color:var(--anchor-body);
+}
+.bg-anchor{background:var(--sec-anchor)}
+.bg-accent{background:var(--sec-accent)}
+/* El contorno del botón sigue al texto, que aquí es claro */
+.bg-anchor .btn--outline,.bg-accent .btn--outline,.footer .btn--outline{border-color:var(--dorado);color:var(--dorado)}
+.bg-anchor .btn--outline:hover,.bg-accent .btn--outline:hover{background:var(--dorado);color:var(--ciruela)}
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ---------- Tipografía display ---------- */
@@ -530,9 +584,11 @@ button{font:inherit}
 .final__img{width:340px;max-width:100%;object-fit:contain;transform:translate3d(0,var(--py,0),0);will-change:transform}
 
 /* ---------- Footer (Footer del DS) ---------- */
-.footer{background:var(--surface-cream);padding:56px var(--gutter) 32px}
+.footer{background:var(--sec-anchor);padding:56px var(--gutter) 32px}
 .footer__grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;max-width:var(--container-max);margin:0 auto}
-.footer__logo{height:64px;width:auto}
+/* El footer es ciruela en los dos esquemas, así que el wordmark va siempre en
+   su versión para fondo oscuro. */
+.footer__logo{height:64px;width:auto;content:url(../assets/logo-wordmark-dark.png)}
 .footer h4{margin:0 0 14px;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-900)}
 .footer__col{font-size:13px;color:var(--ink-500);line-height:1.8}
 .footer__col a{display:inline-block;position:relative}
@@ -835,6 +891,25 @@ html.modal-open{overflow:hidden}
     --blush-50:#40212C; --blush-100:#452430;
     --cream-50:#43222D;
 
+    /* En oscuro no se usan secciones claras: un bloque blush a media página
+       deslumbra. La diferenciación va por matices de ciruela y burdeo. */
+    --sec-base:var(--ciruela);
+    --sec-cream:#412330;
+    --sec-tint:#54293A;
+    --sec-rose:#5E3043;
+    --sec-anchor:#2E1620;
+    --sec-accent:var(--burdeo);
+
+    /* Las anclas ya son oscuras: aquí no se invierte nada */
+    --anchor-heading:var(--blush);
+    --anchor-body:#E6D2D4;
+    --anchor-muted:#C3A6AC;
+    --anchor-faint:#BFA3AA;
+    --anchor-hairline:rgba(250,240,238,.16);
+    --anchor-raised:#4A2530;
+    --anchor-accent:var(--dorado);
+    --anchor-on-accent:var(--ciruela);
+
     --glass:rgba(91,50,64,.86);
     --glass-nav:rgba(74,37,48,.82);
     --glass-nav-solid:rgba(74,37,48,.97);
@@ -850,8 +925,7 @@ html.modal-open{overflow:hidden}
 
   /* El logo lleva el texto en oscuro; en modo oscuro va la versión del manual
      con el texto en blush y el isotipo intacto en rosa y dorado. */
-  .nav__logo img,.footer__logo{content:url(../assets/logo-lockup-dark.png)}
-  .footer__logo{content:url(../assets/logo-wordmark-dark.png)}
+  .nav__logo img{content:url(../assets/logo-lockup-dark.png)}
 
   /* Las fotos de producto se ven duras a plena luminancia sobre fondo oscuro */
   .hero__img,.frame__clip img,.final__img{filter:brightness(.92) contrast(1.02)}
