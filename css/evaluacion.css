@@ -6,6 +6,11 @@
    ========================================================================== */
 
 .eval-page{background:var(--cream-50)}
+
+/* Incrustado en la portada: .section-title lo limita a 640px y la lista de
+   garantías parte 2+1. Un poco más de ancho la deja en una línea. */
+#evaluador .section-title{max-width:760px}
+#evaluador .eval-layout{margin-top:48px}
 .eval-main{padding:calc(var(--nav-h) + 56px) 0 120px}
 
 /* ---------- Encabezado ---------- */
@@ -60,19 +65,20 @@
 .form-grid .full{grid-column:1 / -1}
 
 /* En el wizard el texto del label va suelto dentro de .field (sin .field__label),
-   así que se estiliza el label mismo. */
-.eval-page .field{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:500;
+   así que se estiliza el label mismo. Se acota a .eval y no a .eval-page para
+   que el componente viaje: la portada lo incrusta y no tiene esa clase. */
+.eval .field{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:500;
   letter-spacing:.14em;text-transform:uppercase;color:var(--ink-700)}
-.eval-page .field__opt{text-transform:none;letter-spacing:0;color:var(--ink-300);font-weight:400}
-.eval-page .field input,.eval-page .field select,.eval-page .field textarea{
+.eval .field__opt{text-transform:none;letter-spacing:0;color:var(--ink-300);font-weight:400}
+.eval .field input,.eval .field select,.eval .field textarea{
   width:100%;font-family:var(--font-sans);font-size:15px;font-weight:400;letter-spacing:0;text-transform:none;
   color:var(--ink-900);padding:12px 14px;background:#fff;
   border:1px solid var(--border-hairline);border-radius:var(--radius-xs);outline:none;
   transition:border-color var(--dur-quick) var(--ease-brand);
 }
-.eval-page .field textarea{resize:vertical;min-height:84px}
-.eval-page .field input:focus,.eval-page .field select:focus,.eval-page .field textarea:focus{border-color:var(--focus-ring)}
-.eval-page .field .is-invalid,.eval-page .field input.is-invalid{border-color:var(--negative)}
+.eval .field textarea{resize:vertical;min-height:84px}
+.eval .field input:focus,.eval .field select:focus,.eval .field textarea:focus{border-color:var(--focus-ring)}
+.eval .field .is-invalid,.eval .field input.is-invalid{border-color:var(--negative)}
 
 /* ---------- Grupos de opciones ---------- */
 .choice-group{border:0;margin:0;padding:0;min-width:0;grid-column:1 / -1}
@@ -100,8 +106,11 @@
   padding:24px;background:var(--blush-50);border:1px solid var(--border-hairline);
 }
 
-/* Trampa para bots: fuera de pantalla, nunca visible ni enfocable con el teclado */
-.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+/* Trampa para bots: invisible y fuera del orden de lectura. Se recorta en vez
+   de empujarla a -9999px, que ensanchaba la caja del documento y provocaba
+   scroll horizontal en móvil. */
+.hp{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 
 .privacy-note{
   margin-top:28px;padding-left:14px;border-left:2px solid var(--rose-300);

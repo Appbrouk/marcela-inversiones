@@ -20,6 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/evaluacion.css">
   <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
@@ -84,7 +85,7 @@
         <h1 class="display display--xl" data-split>Invierte en las mejores propiedades de Santiago</h1>
         <p class="lead" data-reveal style="--d:520">Te acompaño estratégicamente en cada etapa, con una asesoría personalizada y transparente. ¿Estás preparado para obtener beneficios exclusivos?</p>
         <div class="hero__actions" data-reveal style="--d:680">
-          <a class="btn btn--lg" href="/evaluacion">Evalúa tu perfil</a>
+          <a class="btn btn--lg" href="#evaluador">Evalúa tu perfil</a>
           <a class="btn btn--lg btn--outline" href="#servicios">Agendar</a>
         </div>
         <p class="hero__sign" data-reveal="fade" style="--d:880">Soy Marcela Díaz, fundadora de MD Invest.</p>
@@ -98,11 +99,23 @@
   </section>
 
   <!-- Franja CTA -->
-  <section class="strip bg-blush">
-    <div data-reveal>
-      <h2>¿Cuánto puedes invertir?</h2>
-      <p>Evaluación de perfil en 5 minutos · Pre-diagnóstico al instante · Sin costo</p>
-      <a class="btn btn--outline" href="/evaluacion">Evalúa tu perfil</a>
+  <!-- Evaluador de perfil. El marcado lo monta js/evaluacion.js en #eval-mount:
+       esta sección y la página /evaluacion comparten una sola plantilla. -->
+  <section id="evaluador" class="section bg-blush">
+    <div class="container">
+      <div class="section-title" data-reveal>
+        <div class="kicker kicker--rose">
+          <span class="kicker__line"></span><span>Evaluación de perfil</span><span class="kicker__line"></span>
+        </div>
+        <h2>¿Cuánto puedes invertir?</h2>
+        <p>Complétalo en 5 minutos y verás al instante una estimación de tu capacidad de inversión, con los mismos criterios que usan los bancos.</p>
+        <ul class="trust">
+          <li>Sin costo ni compromiso</li>
+          <li>No pido claves ni documentos</li>
+          <li>Pre-diagnóstico al instante</li>
+        </ul>
+      </div>
+      <div class="eval-layout eval" id="eval-mount"></div>
     </div>
   </section>
 
@@ -126,7 +139,7 @@
           <p>Evaluamos tu perfil y capacidad de inversión, sin costo.</p>
           <div class="card__foot">
             <span class="card__price">Gratis</span>
-            <a class="btn btn--sm" href="/evaluacion">Evaluar mi perfil</a>
+            <a class="btn btn--sm" href="#evaluador">Evaluar mi perfil</a>
           </div>
         </article>
         <article class="card tilt" data-reveal>
@@ -138,7 +151,7 @@
           <p>Evaluamos tu situación crediticia y las mejores opciones de financiamiento.</p>
           <div class="card__foot">
             <span class="card__price">Gratis</span>
-            <a class="btn btn--sm" href="/evaluacion">Evaluar mi perfil</a>
+            <a class="btn btn--sm" href="#evaluador">Evaluar mi perfil</a>
           </div>
         </article>
       </div>
@@ -361,6 +374,12 @@
 </main>
 
 <!-- Footer -->
+<!-- Resumen flotante del pre-diagnóstico en móvil, donde el panel queda fuera de vista -->
+<div class="diag-mini" id="diag-mini" aria-hidden="true">
+  <span>Podrías optar hasta</span>
+  <strong id="mini-precio">UF 0</strong>
+</div>
+
 <footer class="footer">
   <div class="footer__grid">
     <div>
@@ -398,6 +417,7 @@
 
 <script src="js/projects.js" defer></script>
 <script src="js/main.js" defer></script>
+<script src="js/evaluacion.js" defer></script>
 
 <!-- Vercel Web Analytics. Es la integración para HTML plano: no usa el paquete
      @vercel/analytics, que requiere bundler. Vercel sirve script.js desde el

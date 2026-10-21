@@ -16,6 +16,305 @@
   'use strict';
 
   var d = document;
+
+  /* ---------- Plantilla ----------
+     El wizard se monta desde aquí y no desde el HTML para que la portada y
+     /evaluacion compartan una sola fuente: son el mismo formulario escribiendo
+     en la misma tabla, y dos copias del marcado acabarían divergiendo.
+     Ambas páginas solo necesitan <div id="eval-mount"></div>. */
+  var MARKUP = `
+<div class="wizard panel" id="wizard">
+  <ol class="progress-steps" id="progress" aria-label="Progreso de la evaluación">
+    <li class="is-current">Tus datos</li>
+    <li>Trabajo e ingresos</li>
+    <li>Deudas y ahorro</li>
+    <li>Complemento</li>
+    <li>Tu objetivo</li>
+  </ol>
+
+  <form id="eval-form" novalidate>
+
+    <!-- Trampa para bots: invisible y fuera del orden de tabulación -->
+    <div class="hp" aria-hidden="true">
+      <label>No completar<input type="text" name="sitio_web_empresa" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <!-- PASO 1 -->
+    <fieldset class="step" data-step="1">
+      <legend class="step__title" tabindex="-1">Cuéntanos sobre ti</legend>
+      <p class="step__hint">Uso estos datos para contactarte y para conocer tu situación personal.</p>
+      <div class="form-grid">
+        <label class="field">Nombre<input type="text" name="nombre" autocomplete="given-name" placeholder="Tu nombre" required></label>
+        <label class="field">Apellido<input type="text" name="apellido" autocomplete="family-name" placeholder="Tu apellido" required></label>
+        <label class="field">Correo electrónico<input type="email" name="email" autocomplete="email" placeholder="nombre@correo.cl" required></label>
+        <label class="field">Teléfono<input type="tel" name="telefono" autocomplete="tel" placeholder="+56 9" required></label>
+        <label class="field">Edad<input type="number" name="edad" min="18" max="85" inputmode="numeric" placeholder="Ej: 32" required></label>
+        <label class="field">Comuna donde vives<input type="text" name="comuna_residencia" autocomplete="address-level2" placeholder="Ej: Ñuñoa" required></label>
+        <fieldset class="choice-group full" data-required>
+          <legend>Estado civil</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="estado_civil" value="Soltero/a"><span>Soltero/a</span></label>
+            <label class="choice"><input type="radio" name="estado_civil" value="Casado/a"><span>Casado/a</span></label>
+            <label class="choice"><input type="radio" name="estado_civil" value="Conviviente civil"><span>Conviviente civil</span></label>
+            <label class="choice"><input type="radio" name="estado_civil" value="Divorciado/a o viudo/a"><span>Divorciado/a o viudo/a</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group full" data-required>
+          <legend>Nacionalidad y residencia</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="residencia" value="Chilena"><span>Chilena</span></label>
+            <label class="choice"><input type="radio" name="residencia" value="Extranjera con residencia definitiva"><span>Extranjera con residencia definitiva</span></label>
+            <label class="choice"><input type="radio" name="residencia" value="Extranjera con residencia temporal"><span>Extranjera con residencia temporal</span></label>
+          </div>
+        </fieldset>
+      </div>
+    </fieldset>
+
+    <!-- PASO 2 -->
+    <fieldset class="step" data-step="2" hidden>
+      <legend class="step__title" tabindex="-1">Trabajo e ingresos</legend>
+      <p class="step__hint">Los bancos evalúan tu renta líquida (lo que recibes después de descuentos), tu tipo de contrato y tu antigüedad laboral.</p>
+      <div class="form-grid">
+        <fieldset class="choice-group full" data-required>
+          <legend>Situación laboral</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="situacion" value="Dependiente con contrato indefinido"><span>Contrato indefinido</span></label>
+            <label class="choice"><input type="radio" name="situacion" value="Dependiente con contrato a plazo fijo"><span>Contrato a plazo fijo</span></label>
+            <label class="choice"><input type="radio" name="situacion" value="Independiente con boletas de honorarios"><span>Independiente (boletas)</span></label>
+            <label class="choice"><input type="radio" name="situacion" value="Empresario/a o socio/a"><span>Empresario/a o socio/a</span></label>
+            <label class="choice"><input type="radio" name="situacion" value="Jubilado/a o pensionado/a"><span>Jubilado/a o pensionado/a</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group full" data-required>
+          <legend>Antigüedad laboral (o desde tu inicio de actividades)</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="antiguedad" value="Menos de 1 año"><span>Menos de 1 año</span></label>
+            <label class="choice"><input type="radio" name="antiguedad" value="1 a 2 años"><span>1 a 2 años</span></label>
+            <label class="choice"><input type="radio" name="antiguedad" value="2 a 5 años"><span>2 a 5 años</span></label>
+            <label class="choice"><input type="radio" name="antiguedad" value="Más de 5 años"><span>Más de 5 años</span></label>
+          </div>
+        </fieldset>
+        <label class="field">Renta líquida mensual<input type="text" name="renta" inputmode="numeric" data-money placeholder="$ 0" required></label>
+        <label class="field"><span>Otros ingresos demostrables <span class="field__opt">(opcional)</span></span><input type="text" name="otros_ingresos" inputmode="numeric" data-money placeholder="Arriendos, pensiones, etc."></label>
+      </div>
+    </fieldset>
+
+    <!-- PASO 3 -->
+    <fieldset class="step" data-step="3" hidden>
+      <legend class="step__title" tabindex="-1">Deudas y ahorro</legend>
+      <p class="step__hint">Indica cuánto pagas al mes en cada tipo de deuda. Si no tienes, déjalo en blanco. Esto define tu carga financiera.</p>
+      <div class="form-grid">
+        <label class="field">Créditos de consumo o automotriz<input type="text" name="deuda_consumo" inputmode="numeric" data-money placeholder="$ 0 al mes"></label>
+        <label class="field">Tarjetas y líneas de crédito<input type="text" name="deuda_tarjetas" inputmode="numeric" data-money placeholder="$ 0 al mes"></label>
+        <label class="field">Dividendo hipotecario actual<input type="text" name="deuda_hipotecario" inputmode="numeric" data-money placeholder="$ 0 al mes"></label>
+        <fieldset class="choice-group full" data-required>
+          <legend>¿Tienes propiedades a tu nombre?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="propiedades" value="No"><span>No</span></label>
+            <label class="choice"><input type="radio" name="propiedades" value="Sí, una"><span>Sí, una</span></label>
+            <label class="choice"><input type="radio" name="propiedades" value="Sí, dos o más"><span>Sí, dos o más</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group full" data-required>
+          <legend>¿Registras morosidades o deudas impagas (DICOM)?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="dicom" value="No registro morosidades"><span>No</span></label>
+            <label class="choice"><input type="radio" name="dicom" value="Sí, pero ya están regularizadas"><span>Sí, ya regularizadas</span></label>
+            <label class="choice"><input type="radio" name="dicom" value="Sí, tengo morosidades vigentes"><span>Sí, vigentes</span></label>
+            <label class="choice"><input type="radio" name="dicom" value="No lo sé"><span>No lo sé</span></label>
+          </div>
+        </fieldset>
+        <label class="field">Ahorro disponible para el pie<input type="text" name="ahorro_pie" inputmode="numeric" data-money placeholder="$ 0" required></label>
+        <label class="field"><span>Capacidad de ahorro mensual <span class="field__opt">(opcional)</span></span><input type="text" name="ahorro_mensual" inputmode="numeric" data-money placeholder="$ 0 al mes"></label>
+      </div>
+    </fieldset>
+
+    <!-- PASO 4 -->
+    <fieldset class="step" data-step="4" hidden>
+      <legend class="step__title" tabindex="-1">Complemento de renta</legend>
+      <p class="step__hint">Sumar la renta de otra persona (cónyuge, pareja o familiar directo) puede aumentar el crédito al que puedes optar.</p>
+      <div class="form-grid">
+        <fieldset class="choice-group full" data-required>
+          <legend>¿Complementarás renta con otra persona?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="complementa" value="si"><span>Sí</span></label>
+            <label class="choice"><input type="radio" name="complementa" value="no"><span>No</span></label>
+            <label class="choice"><input type="radio" name="complementa" value="no-se"><span>Aún no lo sé</span></label>
+          </div>
+        </fieldset>
+        <div class="subpanel" id="comp-panel" hidden>
+          <label class="field">Relación
+            <select name="comp_relacion" data-required-if-comp>
+              <option value="">Selecciona</option>
+              <option>Cónyuge</option>
+              <option>Conviviente civil</option>
+              <option>Pareja</option>
+              <option>Familiar directo (padre, madre, hermano/a, hijo/a)</option>
+            </select>
+          </label>
+          <label class="field">Su renta líquida mensual<input type="text" name="comp_renta" inputmode="numeric" data-money placeholder="$ 0" data-required-if-comp></label>
+          <label class="field">Su situación laboral
+            <select name="comp_situacion" data-required-if-comp>
+              <option value="">Selecciona</option>
+              <option>Contrato indefinido</option>
+              <option>Contrato a plazo fijo</option>
+              <option>Independiente (boletas)</option>
+              <option>Empresario/a o socio/a</option>
+              <option>Jubilado/a o pensionado/a</option>
+            </select>
+          </label>
+          <label class="field">Su antigüedad laboral
+            <select name="comp_antiguedad">
+              <option value="">Selecciona</option>
+              <option>Menos de 1 año</option>
+              <option>1 a 2 años</option>
+              <option>2 a 5 años</option>
+              <option>Más de 5 años</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- PASO 5 -->
+    <fieldset class="step" data-step="5" hidden>
+      <legend class="step__title" tabindex="-1">Tu objetivo</legend>
+      <p class="step__hint">Con esto filtro los proyectos que voy a recomendarte.</p>
+      <div class="form-grid">
+        <fieldset class="choice-group full" data-required>
+          <legend>¿Para qué quieres la propiedad?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="objetivo" value="Invertir para arrendar"><span>Invertir para arrendar</span></label>
+            <label class="choice"><input type="radio" name="objetivo" value="Comprar para vivir"><span>Comprar para vivir</span></label>
+            <label class="choice"><input type="radio" name="objetivo" value="Ambas"><span>Ambas</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group full" data-required>
+          <legend>¿Cuántas propiedades te interesan?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="cantidad" value="1"><span>1</span></label>
+            <label class="choice"><input type="radio" name="cantidad" value="2"><span>2</span></label>
+            <label class="choice"><input type="radio" name="cantidad" value="3 o más"><span>3 o más</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group full">
+          <legend>Comunas de interés <span class="field__opt">(puedes marcar varias)</span></legend>
+          <div class="choices" id="comunas-choices"></div>
+        </fieldset>
+        <fieldset class="choice-group full">
+          <legend>Tipo de entrega preferida</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="entrega" value="Inmediata"><span>Inmediata</span></label>
+            <label class="choice"><input type="radio" name="entrega" value="Futura (en verde o en blanco)"><span>Futura (en verde o en blanco)</span></label>
+            <label class="choice"><input type="radio" name="entrega" value="Me da igual"><span>Me da igual</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group full" data-required>
+          <legend>¿Cuándo te gustaría invertir?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="plazo" value="Lo antes posible"><span>Lo antes posible</span></label>
+            <label class="choice"><input type="radio" name="plazo" value="En los próximos 3 meses"><span>En 3 meses</span></label>
+            <label class="choice"><input type="radio" name="plazo" value="En 6 meses o más"><span>En 6 meses o más</span></label>
+            <label class="choice"><input type="radio" name="plazo" value="Solo estoy explorando"><span>Solo estoy explorando</span></label>
+          </div>
+        </fieldset>
+        <label class="field full"><span>Proyecto de interés <span class="field__opt">(opcional)</span></span><input type="text" name="proyecto" id="proyecto" placeholder="Ej: Ñuñoa 2024"></label>
+        <fieldset class="choice-group" data-required>
+          <legend>¿Cómo prefieres que te contacte?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="canal" value="WhatsApp"><span>WhatsApp</span></label>
+            <label class="choice"><input type="radio" name="canal" value="Llamada"><span>Llamada</span></label>
+            <label class="choice"><input type="radio" name="canal" value="Correo"><span>Correo</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group">
+          <legend>Horario preferido</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="horario" value="Mañana (9 a 13 h)"><span>Mañana</span></label>
+            <label class="choice"><input type="radio" name="horario" value="Tarde (13 a 18 h)"><span>Tarde</span></label>
+            <label class="choice"><input type="radio" name="horario" value="Después de las 18 h"><span>Después de las 18 h</span></label>
+          </div>
+        </fieldset>
+        <label class="field full"><span>¿Algo más que deba saber? <span class="field__opt">(opcional)</span></span><textarea name="comentarios" rows="3" placeholder="Ej: quiero usar mi subsidio, tengo un crédito por terminar, etc."></textarea></label>
+        <label class="check full"><input type="checkbox" name="acepto" value="si" required>
+          <span class="check__box" aria-hidden="true"><svg viewBox="0 0 10 8"><path pathLength="1" d="M1 4l2.5 2.5L9 1"/></svg></span>
+          <span>Autorizo a Marcela Díaz Inversiones a usar estos datos para evaluar mi perfil y contactarme.</span>
+        </label>
+      </div>
+      <p class="privacy-note">
+        No te pido claves bancarias ni documentos en esta etapa, y no consulto tu DICOM: el pre-diagnóstico usa solo lo que declaras. Los antecedentes (liquidaciones, cotizaciones, carpeta tributaria) se solicitan más adelante.
+      </p>
+    </fieldset>
+
+    <p class="form__error" id="step-error" role="alert" hidden></p>
+
+    <div class="wizard__nav">
+      <button type="button" class="btn btn--sm btn--ghost" id="btn-back" hidden>← Volver</button>
+      <span class="wizard__count" id="step-count">Paso 1 de 5</span>
+      <button type="button" class="btn" id="btn-next">Continuar →</button>
+      <button type="submit" class="btn" id="btn-submit" hidden>Enviar evaluación</button>
+    </div>
+  </form>
+
+  <!-- CONFIRMACIÓN -->
+  <div class="done" id="done" role="status" tabindex="-1">
+    <div class="done__head">
+      <svg class="success__icon" viewBox="0 0 56 56" aria-hidden="true">
+        <circle pathLength="1" cx="28" cy="28" r="26"/>
+        <path pathLength="1" d="M18 29l7 7 14-16"/>
+      </svg>
+      <h2 id="done-title">¡Recibimos tu evaluación!</h2>
+      <p>Revisaré tu perfil y te contactaré por el canal que elegiste con tus alternativas de inversión.</p>
+    </div>
+    <ol class="next-steps">
+      <li><strong>Reviso tu perfil</strong>Analizo renta, deudas, ahorro y complemento como lo haría un banco.</li>
+      <li><strong>Te contacto</strong>Conversamos tus resultados y resolvemos tus dudas.</li>
+      <li><strong>Armamos tu carpeta</strong>Te pido los antecedentes para presentarte a los bancos.</li>
+    </ol>
+    <table class="summary" id="summary" aria-label="Resumen de tu evaluación"></table>
+    <div class="done__projects" id="done-projects" hidden>
+      <h3>Proyectos que podrían calzar contigo</h3>
+      <div class="done__cards" id="done-list"></div>
+    </div>
+    <div class="done__actions">
+      <a class="btn" id="done-wa" href="https://wa.me/56951497482" target="_blank" rel="noopener">Escribir a Marcela por WhatsApp</a>
+      <a class="btn btn--ghost" href="/#proyectos">Ver proyectos</a>
+    </div>
+  </div>
+</div>
+
+<!-- PRE-DIAGNÓSTICO -->
+<aside class="diag" id="diag" aria-live="polite" aria-label="Tu pre-diagnóstico">
+  <div class="kicker kicker--rose diag__kicker">
+    <span class="kicker__line"></span><span>Tu pre-diagnóstico</span><span class="kicker__line"></span>
+  </div>
+  <p class="diag__empty" id="diag-empty">Cuando ingreses tu renta (paso 2) verás aquí una estimación referencial de tu capacidad de inversión.</p>
+  <div id="diag-body" class="diag__body" hidden>
+    <span class="diag__status" id="diag-status">—</span>
+    <div>
+      <div class="diag__label">Podrías optar a propiedades de hasta</div>
+      <div class="diag__big" id="diag-precio">UF 0</div>
+      <div class="diag__label" id="diag-precio-clp">≈ $0</div>
+    </div>
+    <div>
+      <div class="diag__label" id="diag-carga-label">Carga financiera actual: 0% de tu renta</div>
+      <div class="meter" aria-hidden="true"><span id="diag-meter"></span></div>
+    </div>
+    <div class="diag__row"><span>Renta considerada</span><strong id="diag-renta">$0</strong></div>
+    <div class="diag__row"><span>Dividendo máximo referencial</span><strong id="diag-div">$0</strong></div>
+    <div class="diag__row"><span>Crédito estimado</span><strong id="diag-credito">UF 0</strong></div>
+    <div class="diag__row"><span>Pie requerido (20%)</span><strong id="diag-pie">UF 0</strong></div>
+    <div class="diag__row"><span>Tu ahorro para el pie</span><strong id="diag-ahorro">UF 0</strong></div>
+    <ul class="flags" id="diag-flags"></ul>
+    <div class="diag__matches" id="diag-matches"></div>
+  </div>
+  <p class="diag__note" id="diag-note"></p>
+</aside>
+`;
+
+  var mount = d.getElementById('eval-mount');
+  if (mount && !d.getElementById('eval-form')) mount.innerHTML = MARKUP;
+
   var form = d.getElementById('eval-form');
   if (!form) return;
 
