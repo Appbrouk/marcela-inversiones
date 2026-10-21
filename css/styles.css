@@ -69,6 +69,13 @@
   --hairline-soft:rgba(25,24,23,.08);
   --veil:rgba(25,24,23,.5);
 
+  /* Diferencias de esquema que no son color plano. Al ser tokens, el bloque
+     oscuro no necesita ninguna regla propia: solo reasignar variables. */
+  --glow-filter:saturate(1);
+  --glow-opacity:1;
+  --logo-nav:url(../assets/logo-lockup.png);
+  --photo-filter:none;
+
   --shadow-card:0 1px 2px rgba(74,37,48,.05),0 8px 24px rgba(74,37,48,.07);
   --shadow-lift:0 2px 4px rgba(74,37,48,.07),0 16px 40px rgba(74,37,48,.12);
 
@@ -275,7 +282,7 @@ button{font:inherit}
   padding:18px var(--gutter);transition:padding .5s var(--ease-out);
 }
 .nav.is-scrolled .nav__inner{padding-top:12px;padding-bottom:12px}
-.nav__logo img{height:52px;width:auto;transition:height .5s var(--ease-out)}
+.nav__logo img{content:var(--logo-nav);height:52px;width:auto;transition:height .5s var(--ease-out)}
 .nav.is-scrolled .nav__logo img{height:42px}
 .nav__links{position:relative;display:flex;align-items:center;gap:32px}
 .nav__links a{
@@ -301,6 +308,27 @@ button{font:inherit}
 .nav__burger span:nth-child(2){top:26px}
 .menu-open .nav__burger span:nth-child(1){top:22px;transform:rotate(45deg)}
 .menu-open .nav__burger span:nth-child(2){top:22px;transform:rotate(-45deg)}
+
+/* ---------- Interruptor de esquema ----------
+   Sin JavaScript el botón no hace nada, así que no se muestra: el esquema
+   automático del CSS sigue funcionando igual. El icono anuncia el destino, no
+   el estado actual — luna en claro ("ir a oscuro"), sol en oscuro. */
+.tema{display:none}
+.js .tema{
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:40px;height:40px;padding:0;
+  background:transparent;color:var(--text-heading);
+  border:1px solid var(--border-hairline);border-radius:var(--radius-pill);
+  cursor:pointer;
+  transition:color var(--dur-quick) var(--ease-brand),border-color var(--dur-quick) var(--ease-brand),
+             background var(--dur-quick) var(--ease-brand);
+}
+.tema:hover{color:var(--accent);border-color:var(--accent)}
+.tema:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
+.tema svg{width:18px;height:18px}
+.tema__sol{display:none}
+.tema[aria-pressed="true"] .tema__sol{display:block}
+.tema[aria-pressed="true"] .tema__luna{display:none}
 
 /* Menú móvil a pantalla completa */
 .menu{
@@ -381,10 +409,11 @@ button{font:inherit}
 .hero__glow{ /* único degradado permitido por la marca: brillo radial crema */
   position:absolute;left:-15%;right:-15%;bottom:-20%;height:75%;pointer-events:none;
   background:radial-gradient(closest-side,rgba(255,234,230,.95),rgba(246,239,228,.5) 55%,transparent 100%);
-  filter:blur(24px);animation:breathe 9s ease-in-out infinite alternate;
+  filter:blur(24px) var(--glow-filter);opacity:var(--glow-opacity);
+  animation:breathe 9s ease-in-out infinite alternate;
 }
 @keyframes breathe{from{transform:translateY(0) scale(1)}to{transform:translateY(-14px) scale(1.06)}}
-.hero__img{
+.hero__img{filter:var(--photo-filter);
   position:relative;z-index:1;width:100%;max-height:620px;object-fit:contain;object-position:bottom;
   transform:translate3d(var(--px,0),var(--py,0),0) rotate(var(--rot,0deg));
   will-change:transform;
@@ -514,6 +543,7 @@ button{font:inherit}
   content:"";position:absolute;inset:14px -14px -14px 14px;border:1px solid var(--gold-300);z-index:-1;
   transform:translate3d(calc(var(--py,0px) * -.35),calc(var(--py,0px) * .35),0);
 }
+.frame__clip img{filter:var(--photo-filter)}
 .frame__clip{overflow:hidden}
 .frame img{width:100%;object-fit:cover;transform:translate3d(0,var(--py,0),0) scale(1.08);will-change:transform}
 .about__copy .kicker{margin-bottom:24px}
@@ -581,7 +611,7 @@ button{font:inherit}
 .final__copy{padding-bottom:72px;align-self:center}
 .final__copy p{margin-top:18px;color:var(--ink-500);max-width:420px}
 .final__actions{display:flex;gap:16px;margin-top:32px;flex-wrap:wrap}
-.final__img{width:340px;max-width:100%;object-fit:contain;transform:translate3d(0,var(--py,0),0);will-change:transform}
+.final__img{filter:var(--photo-filter);width:340px;max-width:100%;object-fit:contain;transform:translate3d(0,var(--py,0),0);will-change:transform}
 
 /* ---------- Footer (Footer del DS) ---------- */
 .footer{background:var(--sec-anchor);padding:56px var(--gutter) 32px}
@@ -806,6 +836,10 @@ html.modal-open{overflow:hidden}
   :root{--gutter:24px;--section-pad:72px;--nav-h:68px}
   .nav__links,.nav__cta{display:none}
   .nav__burger{display:block}
+  /* El interruptor sobrevive al CTA: queda entre el logo y la hamburguesa,
+     siempre a la vista, sin obligar a abrir el menú para cambiar de esquema. */
+  .nav__inner{gap:12px}
+  .js .tema{margin-left:auto;width:38px;height:38px}
   .nav__logo img{height:38px}
   .hero__grid{grid-template-columns:1fr;gap:8px;padding-top:calc(var(--nav-h) + 40px)}
   .hero__copy{padding-bottom:32px}
@@ -853,8 +887,24 @@ html.modal-open{overflow:hidden}
    aparecen como texto, así que aquí se aclaran; rose-300 y gold-400 son fondos
    y se oscurecen. --ciruela, --blush y el resto de la marca no cambian nunca.
    ========================================================================== */
+
+/* ==========================================================================
+   Modo oscuro
+   ==========================================================================
+   Dos disparadores:
+     · la preferencia del dispositivo, salvo que la persona haya elegido claro;
+     · la elección manual guardada, que gana sobre el dispositivo.
+
+   El mapeo se repite bajo los dos selectores porque una media query no puede
+   ir dentro de una lista de selectores. Es la única duplicación del archivo:
+   si tocas uno, toca el otro. A cambio, el modo oscuro funciona sin JavaScript
+   y no hay ni una regla de componente duplicada — todo son tokens, incluidos
+   el logo, el filtro de las fotos y el brillo del héroe.
+   ========================================================================== */
+:root[data-theme="light"]{color-scheme:light}
+
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --surface-page:var(--ciruela);
     --surface-raised:#5B3240;        /* por encima del fondo, para que las tarjetas levanten */
     --surface-sunken:#3B1D27;
@@ -877,17 +927,12 @@ html.modal-open{overflow:hidden}
     --link:var(--rosa-palo); --link-hover:var(--dorado);
     --focus-ring:var(--dorado); --negative:#E8A49F;
 
-    /* La sombra apenas se ve sobre oscuro: el relieve lo da el borde */
     --shadow-card:0 1px 2px rgba(0,0,0,.28),0 8px 24px rgba(0,0,0,.22);
     --shadow-lift:0 2px 4px rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.3);
 
-    /* Alias heredados, remapeados por uso */
-    --rose-300:var(--burdeo);        /* fondo de ::selection y marcas suaves */
-    --rose-400:#C98F98;              /* mixto: fondo, texto y borde */
-    --rose-500:#DCB2B6;              /* texto */
-    --rose-600:var(--rosa-palo);     /* texto y enlaces */
+    --rose-300:var(--burdeo); --rose-400:#C98F98; --rose-500:#DCB2B6; --rose-600:var(--rosa-palo);
     --gold-300:#8A6C3C; --gold-400:var(--dorado);
-    --gold-500:var(--dorado); --gold-600:#EBD4AC;   /* ambos solo texto */
+    --gold-500:var(--dorado); --gold-600:#EBD4AC;
     --blush-50:#40212C; --blush-100:#452430;
     --cream-50:#43222D;
 
@@ -918,15 +963,82 @@ html.modal-open{overflow:hidden}
     --glow-soft:rgba(228,190,192,.1);
     --hairline-soft:rgba(250,240,238,.12);
     --veil:rgba(20,8,12,.72);
+
+    /* El brillo del héroe es crema: sobre oscuro se vuelve una mancha */
+    --glow-filter:saturate(.6); --glow-opacity:.18;
+    /* Logo con el texto en blush y el isotipo intacto, como indica el manual */
+    --logo-nav:url(../assets/logo-lockup-dark.png);
+    /* Las fotos se ven duras a plena luminancia sobre fondo oscuro */
+    --photo-filter:brightness(.92) contrast(1.02);
+    color-scheme:dark;
   }
+}
 
-  /* El brillo radial del héroe es crema: sobre oscuro se vuelve una mancha */
-  .hero__glow{opacity:.18;filter:saturate(.6)}
+:root[data-theme="dark"]{
+    --surface-page:var(--ciruela);
+    --surface-raised:#5B3240;        /* por encima del fondo, para que las tarjetas levanten */
+    --surface-sunken:#3B1D27;
+    --surface-inverse:var(--blush);  /* se invierte: la franja clara sobre página oscura */
+    --on-inverse:var(--ciruela);
 
-  /* El logo lleva el texto en oscuro; en modo oscuro va la versión del manual
-     con el texto en blush y el isotipo intacto en rosa y dorado. */
-  .nav__logo img{content:url(../assets/logo-lockup-dark.png)}
+    --text-heading:var(--blush);
+    --text-body:#E6D2D4;
+    --text-muted:#C3A6AC;
+    --text-faint:#BFA3AA;
 
-  /* Las fotos de producto se ven duras a plena luminancia sobre fondo oscuro */
-  .hero__img,.frame__clip img,.final__img{filter:brightness(.92) contrast(1.02)}
+    --border-hairline:#6E4654;
+    --accent:var(--dorado);          /* sobre ciruela el dorado manda mejor que el burdeo */
+    --accent-hover:var(--rosa-palo);
+    --on-accent:var(--ciruela);
+    --accent-soft:var(--burdeo);
+    --detail:var(--dorado);
+    --detail-strong:var(--dorado);   /* sobre oscuro ya contrasta, no hace falta apagarlo */
+
+    --link:var(--rosa-palo); --link-hover:var(--dorado);
+    --focus-ring:var(--dorado); --negative:#E8A49F;
+
+    --shadow-card:0 1px 2px rgba(0,0,0,.28),0 8px 24px rgba(0,0,0,.22);
+    --shadow-lift:0 2px 4px rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.3);
+
+    --rose-300:var(--burdeo); --rose-400:#C98F98; --rose-500:#DCB2B6; --rose-600:var(--rosa-palo);
+    --gold-300:#8A6C3C; --gold-400:var(--dorado);
+    --gold-500:var(--dorado); --gold-600:#EBD4AC;
+    --blush-50:#40212C; --blush-100:#452430;
+    --cream-50:#43222D;
+
+    /* En oscuro no se usan secciones claras: un bloque blush a media página
+       deslumbra. La diferenciación va por matices de ciruela y burdeo. */
+    --sec-base:var(--ciruela);
+    --sec-cream:#412330;
+    --sec-tint:#54293A;
+    --sec-rose:#5E3043;
+    --sec-anchor:#2E1620;
+    --sec-accent:var(--burdeo);
+
+    /* Las anclas ya son oscuras: aquí no se invierte nada */
+    --anchor-heading:var(--blush);
+    --anchor-body:#E6D2D4;
+    --anchor-muted:#C3A6AC;
+    --anchor-faint:#BFA3AA;
+    --anchor-hairline:rgba(250,240,238,.16);
+    --anchor-raised:#4A2530;
+    --anchor-accent:var(--dorado);
+    --anchor-on-accent:var(--ciruela);
+
+    --glass:rgba(91,50,64,.86);
+    --glass-nav:rgba(74,37,48,.82);
+    --glass-nav-solid:rgba(74,37,48,.97);
+    --glass-menu:rgba(58,28,38,.96);
+    --glass-border:rgba(250,240,238,.18);
+    --glow-soft:rgba(228,190,192,.1);
+    --hairline-soft:rgba(250,240,238,.12);
+    --veil:rgba(20,8,12,.72);
+
+    /* El brillo del héroe es crema: sobre oscuro se vuelve una mancha */
+    --glow-filter:saturate(.6); --glow-opacity:.18;
+    /* Logo con el texto en blush y el isotipo intacto, como indica el manual */
+    --logo-nav:url(../assets/logo-lockup-dark.png);
+    /* Las fotos se ven duras a plena luminancia sobre fondo oscuro */
+    --photo-filter:brightness(.92) contrast(1.02);
+    color-scheme:dark;
 }

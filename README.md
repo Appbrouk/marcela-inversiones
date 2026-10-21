@@ -80,6 +80,30 @@ Todo vive en tokens, al inicio de `css/styles.css`:
 necesitas escribir una regla dentro del `@media` oscuro, probablemente falte un
 token.
 
+### Interruptor manual
+
+Hay un botón en la barra de navegación, junto al CTA en escritorio y entre el
+logo y la hamburguesa en móvil — ahí, y no dentro del menú, para que no haya
+que abrirlo para cambiar de esquema.
+
+- Por defecto el sitio sigue al dispositivo. En cuanto se pulsa el botón, la
+  elección se guarda en `localStorage` y **gana sobre el dispositivo**.
+- El icono anuncia el destino, no el estado: luna en claro, sol en oscuro.
+- Sin JavaScript el botón no se muestra, pero el esquema automático del CSS
+  sigue funcionando: lo único que se pierde es la elección manual.
+
+Para evitar el destello al cargar, un fragmento en línea dentro del `<head>`
+escribe `data-theme` **antes de pintar**. Si se moviera a un archivo externo
+volvería el salto de claro a oscuro en cada carga.
+
+El bloque de modo oscuro de `css/styles.css` se repite bajo dos selectores
+—`@media (prefers-color-scheme: dark)` con `:root:not([data-theme="light"])`, y
+`:root[data-theme="dark"]`— porque una media query no puede ir dentro de una
+lista de selectores. **Es la única duplicación del archivo: si tocas uno, toca
+el otro.** A cambio, no hay ni una regla de componente duplicada: todas las
+diferencias de esquema son tokens, incluidos el logo (`--logo-nav`), el filtro
+de las fotos (`--photo-filter`) y el brillo del héroe (`--glow-filter`).
+
 ### Ritmo de secciones
 
 Antes blush, cream y blanco estaban a dos o tres puntos de luminancia: las
