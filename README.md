@@ -11,10 +11,8 @@ Es un sitio **100% estático**: HTML, CSS y JavaScript sin dependencias ni paso 
 .
 ├── index.html          # Toda la página (nav, hero, servicios, recursos,
 │                       # proyectos, sobre mí, registro, CTA final, footer)
-├── proyectos.html      # Catálogo completo con filtros (/proyectos)
-├── js/catalogo.js      # Filtros del catálogo (comuna, precio UF, entrega, dormitorios, orden)
-├── js/modal.js         # Modal de detalle de proyecto (lo comparten portada y catálogo)
-├── css/catalogo.css    # Estilos del catálogo
+├── js/catalogo.js      # Catálogo con filtros de la portada (comuna, precio UF, entrega, dormitorios, orden)
+├── js/modal.js         # Modal de detalle de proyecto
 ├── css/styles.css      # Design system (tokens), componentes y animaciones
 ├── js/projects.js      # Catálogo de RESPALDO (carrusel + modal). El real viene de la base
 │                       # compartida vía /api/proyectos y se edita en la intranet.
@@ -219,12 +217,12 @@ proyecto ya escrito.
 
 ### Catálogo con filtros
 
-`/proyectos` muestra todos los proyectos en una grilla con filtros por comuna,
-precio en UF, entrega, dormitorios y orden (mismos criterios que el catálogo de
-IMOBU, con el diseño de este sitio). Los filtros se reflejan en la URL
-(`/proyectos?comuna=Ñuñoa&precio=0-2500`) para poder compartirlos. Las comunas
-salen del propio catálogo. El detalle se abre en el mismo modal de la portada
-(`js/modal.js`).
+La sección **Proyectos** de la portada muestra todos los proyectos en una grilla
+con filtros por comuna, precio en UF, entrega, dormitorios y orden (mismos
+criterios que el catálogo de IMOBU, con el diseño de este sitio). Los filtros se
+reflejan en la URL (`/?comuna=Ñuñoa&precio=0-2500#proyectos`) para poder
+compartirlos. Las comunas salen del propio catálogo. El detalle se abre en el
+modal (`js/modal.js`).
 
 El modal **no tiene enlaces a la inmobiliaria**: los proyectos se venden por
 nuestros medios, así que termina en "Quiero más información" (registro) y
@@ -233,9 +231,8 @@ solo referencia interna.
 
 ### Enlace directo
 
-Cada proyecto tiene URL propia para compartir: `https://mdiaz.cl/#proyecto=<id>`
-(abre el modal sobre la portada) o `https://mdiaz.cl/proyectos#proyecto=<id>`
-(sobre el catálogo).
+Cada proyecto tiene URL propia para compartir: `https://mdiaz.cl/#proyecto=<id>`.
+Al abrirla, la página baja hasta la sección y abre el modal.
 
 ## Formulario de registro → intranet + HubSpot
 

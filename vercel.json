@@ -29,5 +29,12 @@
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/proyectos",
+      "destination": "/#proyectos",
+      "permanent": false
+    }
   ]
 }
