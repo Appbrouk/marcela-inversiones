@@ -11,6 +11,10 @@
   if (!grid || !form) return;
   const count = d.getElementById('catalogo-count');
   const empty = d.getElementById('catalogo-vacio');
+  const mas = d.getElementById('catalogo-mas'), masBtn = d.getElementById('catalogo-mas-btn'), masNota = d.getElementById('catalogo-mas-nota');
+  const PAGINA = 12;            // 3 filas de 4 tarjetas
+  let visibles = PAGINA;
+  const plano = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const esc = window.MD_MODAL ? window.MD_MODAL.esc : (s) => String(s == null ? '' : s);
   const placeholder = window.MD_MODAL && window.MD_MODAL.placeholder;
   const pad2 = (n) => String(n).padStart(2, '0');
@@ -43,7 +47,7 @@
 
   /* Filtros que llegan por URL */
   const params = new URLSearchParams(location.search);
-  ['comuna', 'precio', 'entrega', 'dorm', 'orden'].forEach((k) => { if (params.get(k) !== null && form[k]) form[k].value = params.get(k); });
+  ['q', 'comuna', 'precio', 'entrega', 'dorm', 'orden'].forEach((k) => { if (params.get(k) !== null && form[k]) form[k].value = params.get(k); });
 
   const card = (p, i) => {
     const cover = p.fotos && p.fotos[0];
@@ -61,13 +65,15 @@
       + (specs ? '<p class="project__specs">' + specs + '</p>' : '')
       + (p.resumen ? '<p class="project__excerpt">' + esc(p.resumen) + '</p>' : '')
       + '<div class="project__foot"><span>' + esc(p.desde) + '</span>'
-      + '<button class="btn btn--ghost btn--sm" type="button" data-open="' + esc(p.id) + '" aria-haspopup="dialog">Ver detalles</button>'
+      + '<button class="btn btn--ghost btn--sm" type="button" data-open="' + esc(p.id) + '" aria-haspopup="dialog">Detalles</button>'
       + '</div></div></article>';
   };
 
   const render = () => {
-    const f = { comuna: form.comuna.value, precio: form.precio.value, entrega: form.entrega.value, dorm: form.dorm.value, orden: form.orden.value };
+    const f = { q: form.q.value.trim(), comuna: form.comuna.value, precio: form.precio.value, entrega: form.entrega.value, dorm: form.dorm.value, orden: form.orden.value };
+    const texto = plano(f.q);
     let lista = PROYECTOS.filter((p) => {
+      if (texto && plano([p.nombre, p.comuna, p.inmobiliaria, p.resumen].join(' ')).indexOf(texto) < 0) return false;
       if (f.comuna && p.comuna !== f.comuna) return false;
       if (f.entrega && p.entrega !== f.entrega) return false;
       if (f.dorm !== '' && p.dorm.indexOf(Number(f.dorm)) < 0) return false;
@@ -76,12 +82,17 @@
     });
     if (f.orden === 'precio-asc') lista = lista.slice().sort((a, b) => a.uf - b.uf);
     if (f.orden === 'precio-desc') lista = lista.slice().sort((a, b) => b.uf - a.uf);
-    grid.innerHTML = lista.map(card).join('');
+    const mostrados = lista.slice(0, visibles);
+    grid.innerHTML = mostrados.map(card).join('');
     if (empty) empty.hidden = lista.length > 0;
     if (count) {
-      count.textContent = lista.length === PROYECTOS.length
-        ? pad2(lista.length) + ' proyectos'
-        : pad2(lista.length) + ' de ' + pad2(PROYECTOS.length) + ' proyectos';
+      count.innerHTML = lista.length === PROYECTOS.length
+        ? '<strong>' + pad2(lista.length) + ' proyectos</strong>'
+        : '<strong>' + pad2(lista.length) + '</strong> de ' + pad2(PROYECTOS.length) + ' proyectos';
+    }
+    if (mas) {
+      mas.hidden = lista.length <= visibles;
+      if (masNota) masNota.textContent = 'Mostrando ' + mostrados.length + ' de ' + lista.length;
     }
     /* La URL refleja los filtros: se puede compartir o volver atrás sin perderlos */
     const q = new URLSearchParams();
@@ -89,10 +100,19 @@
     history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash);
   };
 
-  form.addEventListener('change', render);
-  form.addEventListener('submit', (e) => { e.preventDefault(); render(); });
+  const reiniciar = () => { visibles = PAGINA; render(); };
+  form.addEventListener('change', reiniciar);
+  let tQ = 0;
+  form.q.addEventListener('input', () => { clearTimeout(tQ); tQ = setTimeout(reiniciar, 180); });
+  form.addEventListener('submit', (e) => { e.preventDefault(); reiniciar(); });
   const limpiar = d.getElementById('filtros-limpiar');
-  if (limpiar) limpiar.addEventListener('click', () => { form.reset(); render(); });
+  if (limpiar) limpiar.addEventListener('click', () => { form.reset(); reiniciar(); });
+  if (masBtn) masBtn.addEventListener('click', () => {
+    const antes = grid.children.length;
+    visibles += PAGINA; render();
+    const nueva = grid.children[antes];
+    if (nueva) nueva.querySelector('[data-open]').focus({ preventScroll: true });
+  });
 
   grid.addEventListener('click', (e) => {
     const card = e.target.closest('.project');
