@@ -12,14 +12,16 @@ Es un sitio **100% estático**: HTML, CSS y JavaScript sin dependencias ni paso 
 ├── index.html          # Toda la página (nav, hero, servicios, recursos,
 │                       # proyectos, sobre mí, registro, CTA final, footer)
 ├── css/styles.css      # Design system (tokens), componentes y animaciones
-├── js/projects.js      # DATOS de los proyectos (carrusel + modal). Editar aquí.
+├── js/projects.js      # Catálogo de RESPALDO (carrusel + modal). El real viene de la base
+│                       # compartida vía /api/proyectos y se edita en la intranet.
 ├── js/main.js          # Intro, reveals al scroll, parallax, menú móvil, scrollspy,
 │                       # carrusel y modal de proyectos, envío del formulario
 ├── evaluacion.html     # Evaluador de perfil: wizard de 5 pasos
 ├── js/evaluacion.js    # Lógica del wizard y del pre-diagnóstico
 ├── css/evaluacion.css  # Estilos del evaluador
-├── api/evaluacion.mjs  # Función serverless que recibe las evaluaciones
-├── supabase/leads.sql  # Tabla md_leads (ejecutar una vez)
+├── api/proyectos.mjs   # Función serverless: catálogo y parámetros desde la base compartida
+├── api/formulario.mjs  # Función serverless que recibe registros y evaluaciones
+├── supabase/README.md  # Dónde vive el esquema compartido (imobu-web/supabase/web.sql)
 ├── assets/             # Logos, favicon y fotografías
 ├── robots.txt
 └── vercel.json         # Cabeceras de caché/seguridad y clean URLs
@@ -169,15 +171,24 @@ mixta). Si prefieres los titulares en versales con tracking ancho, está en
 
 ## Proyectos (carrusel + modal)
 
-La sección **Proyectos** se dibuja a partir de `js/projects.js`, que expone un
-arreglo `window.MD_PROJECTS`. Es la **única fuente de verdad**: el carrusel
-(tarjetas) y el modal de detalle (galería, descripción, fichas) salen de ahí. No hay
-que tocar HTML ni CSS para agregar, quitar o reordenar proyectos.
+La sección **Proyectos** se dibuja a partir de `window.MD_PROJECTS`. Hay dos
+fuentes, en este orden:
 
-### Agregar un proyecto
+1. `js/projects.js` — catálogo de **respaldo**, el mismo formato de siempre.
+2. `/api/proyectos` — función serverless que lee la **base compartida con
+   IMOBU** (`web_proyectos`) y, si hay proyectos marcados para `mdiaz`,
+   reemplaza `window.MD_PROJECTS`. También deja `window.MD_CONFIG` con los
+   parámetros publicados desde la intranet (WhatsApp, HubSpot, supuestos del
+   evaluador).
 
-1. Sube las fotos a `assets/` (idealmente `.webp`, ≤ 1600 px de ancho, < 250 KB).
-2. Agrega un objeto al arreglo:
+Los proyectos se crean y editan en la **intranet compartida**
+(<https://imobu.cl/intranet.html>): un proyecto se guarda una vez y aparece en
+imobu.cl y en mdiaz.cl según las webs que se marquen en "Mostrar en". Los
+cambios se ven aquí en menos de un minuto (la función se cachea 60 s en el CDN).
+El esquema y la activación están en `imobu-web/supabase/web.sql` y
+`imobu-web/docs/INTRANET-COMPARTIDA.md`.
+
+### Qué campos tiene un proyecto
 
 ```js
 {
@@ -185,41 +196,41 @@ que tocar HTML ni CSS para agregar, quitar o reordenar proyectos.
   nombre: "Vitacura Parque",
   inmobiliaria: "Fundamenta",     // se muestra bajo el nombre
   comuna: "Vitacura",
-  desde: "Desde 5.200 UF",
-  etiqueta: "Últimas unidades",   // opcional, badge rosa
+  desde: "Desde 5.200 UF",        // en la base es el número en UF; aquí llega ya formateado
+  etiqueta: "Últimas unidades",   // badge rosa; vacío = "Entrega inmediata" o "Entrega futura"
   resumen: "Una frase para la tarjeta.",                 // opcional
   descripcion: ["Párrafo 1 del modal.", "Párrafo 2."],   // string o arreglo
-  datos: [["Tipologías", "1D1B · 2D2B"], ["Entrega", "2026"]], // opcional
+  datos: [["Tipologías", "1D1B · 2D2B"], ["Entrega", "2026"]], // opcional; si falta se arma con tipologías y superficie
   fotos: [
-    { src: "assets/vitacura-1.webp", alt: "Fachada" },   // la primera es la portada
-    { src: "assets/vitacura-2.webp", alt: "Piscina" },
+    { src: "https://mdiaz.cl/assets/vitacura-1.webp", alt: "Fachada" },   // la primera es la portada
   ],
   enlace: "https://…",            // opcional: botón "Ver ficha completa"
 }
 ```
 
-Si `fotos` va vacío se dibuja un placeholder editorial con el número del proyecto.
-El botón **Conversemos** del modal abre WhatsApp con el nombre del proyecto ya
-escrito en el mensaje.
+Las fotos deben ser URLs completas (`https://…`), porque el mismo proyecto se
+muestra desde dos dominios. Si `fotos` va vacío se dibuja un placeholder
+editorial. El botón **Conversemos** del modal abre WhatsApp con el nombre del
+proyecto ya escrito.
 
 ### Enlace directo
 
 Cada proyecto tiene URL propia para compartir: `https://mdiaz.cl/#proyecto=<id>`.
 Al abrirla, la página baja hasta la sección y abre el modal.
 
-### ¿Y si los proyectos cambian seguido?
+## Formulario de registro → intranet + HubSpot
 
-El archivo JS es la opción más simple para un sitio estático: sin build, sin CORS,
-sin un request extra y funciona incluso abriendo el HTML en local. Si más adelante
-alguien sin acceso al repo necesita editar proyectos, el mismo arreglo puede venir
-de un `data/projects.json` (con `fetch`) o de un CMS/Airtable/Sheets: la forma de los
-datos no cambia, solo de dónde se leen.
+El formulario hace `POST /api/formulario` (`tipo: "registro"`): la función
+valida y guarda el registro en la tabla compartida `web_leads`, de donde lo lee
+la intranet (pestaña **Formularios**, junto a los de IMOBU). Si eso falla, la
+persona ve un error y puede reintentar. Si funciona, además se **copia a la
+Forms API de HubSpot** desde el navegador, sin bloquear: si HubSpot rechaza el
+envío, el dato ya quedó en la intranet.
 
-## Formulario de registro → HubSpot
-
-El formulario envía los datos a la **Forms API de HubSpot** directamente desde el
-navegador. No hay backend ni claves secretas: `portalId` y `formGuid` son públicos
-(aparecen en cualquier formulario embebido de HubSpot).
+`portalId` y `formGuid` son públicos (aparecen en cualquier formulario embebido
+de HubSpot). Se editan en la intranet (Web MD Invest → Formularios y HubSpot) y
+llegan en `window.MD_CONFIG.hubspot`; los valores de `js/main.js` son el
+respaldo.
 
 ### 1. Crear el formulario en HubSpot
 
@@ -282,16 +293,17 @@ portal se muestra un mensaje genérico con la alternativa de WhatsApp.
 
 ### Sin HubSpot
 
-Si prefieres otro destino, deja `HUBSPOT` vacío y define `FORM_ENDPOINT` en
-`js/main.js` con una URL que reciba un `POST` JSON
-`{ nombre, email, telefono, acepta, origen }`.
+Deja vacíos `portalId` o `formGuid` en la intranet: el registro sigue llegando a
+la intranet y simplemente no se copia a HubSpot.
 
 ## Evaluador de perfil
 
 `/evaluacion` es un wizard de 5 pasos que calcula en vivo la capacidad de
 inversión y sugiere proyectos del catálogo. Portado del evaluador de IMOBU
-(`Appbrouk/imobu-web`), con tres diferencias: no hay sistema de asesores, el
-catálogo sale de `js/projects.js`, y el envío va a una función propia.
+(`Appbrouk/imobu-web`), con dos diferencias: no hay sistema de asesores y el
+envío va a una función propia. Los supuestos (UF, tasa, plazo, pie…) llegan en
+`window.MD_CONFIG.finanzas` desde la intranet; los de `js/evaluacion.js` son el
+respaldo.
 
 ### Cómo calcula
 
@@ -325,22 +337,23 @@ al sumar un proyecto en una comuna nueva, aparece sola.
 
 ### Backend
 
-`POST /api/evaluacion` (función serverless de Vercel). Es `.mjs` a propósito:
+`POST /api/formulario` con `{ tipo: "evaluacion", datos, pagina }` (función
+serverless de Vercel, la misma que recibe el registro). Es `.mjs` a propósito:
 así usa ESM sin un `package.json`, que cambiaría cómo Vercel detecta el
 proyecto — hoy es estático, sin build.
 
-**1. Crear la tabla:** ejecuta `supabase/leads.sql` en el SQL Editor de
-Supabase.
+**1. La base:** es la compartida con IMOBU; el esquema se ejecuta una sola vez
+desde `imobu-web/supabase/web.sql` (ver `supabase/README.md`).
 
 **2. Variables de entorno en Vercel:**
 
 | Variable | Obligatoria | Para qué |
 |---|---|---|
 | `ALLOWED_ORIGINS` | **Sí** | `https://mdiaz.cl,https://www.mdiaz.cl`. Sin esto la función rechaza todo. |
-| `SUPABASE_URL` | Sí* | URL del proyecto de Supabase |
-| `SUPABASE_ANON_KEY` | Sí* | Clave **anon**, no la service_role (ver más abajo) |
+| `SUPABASE_URL` | Sí* | URL del proyecto de Supabase compartido |
+| `SUPABASE_ANON_KEY` | Sí* | Clave **anon / publishable**, no la service_role (ver más abajo). La usan también `/api/proyectos`. |
 | `TURNSTILE_SECRET` | No | Anti-bots de Cloudflare |
-| `RESEND_API_KEY` | No | Avisa por correo de cada evaluación |
+| `RESEND_API_KEY` | No | Avisa por correo de cada formulario |
 | `NOTIFY_EMAIL` | No | Destinatario(s) del aviso |
 | `FROM_EMAIL` | No | Remitente verificado en Resend |
 
@@ -350,17 +363,11 @@ visible.
 
 ### Por qué la clave anon y no la service_role
 
-IMOBU escribe con `SUPABASE_SERVICE_ROLE_KEY`, que salta RLS por diseño. Esa
-base está compartida con la operación de Brouk (usuarios, unidades, contactos,
-comisiones), así que una service_role en el entorno de un sitio público daría
-acceso total a todo eso si la variable se filtrara.
-
-Aquí la tabla `md_leads` concede a `anon` **solo INSERT**, y solo en tres
-columnas. Esa credencial no puede leer los leads ni tocar ninguna otra tabla, y
-además nunca llega al navegador porque la función hace de intermediaria.
-
-Para **leer** los leads: panel de Supabase, o una service_role que viva fuera de
-este proyecto.
+La tabla `web_leads` concede a `anon` **solo INSERT**, y solo en columnas
+fijas (`sitio`, `tipo`, `pagina`, `asesor`, `datos`). Esa credencial no puede
+leer los leads ni tocar ninguna otra tabla, y además nunca llega al navegador
+porque la función hace de intermediaria. Los leen únicamente los
+administradores autenticados en la intranet (lo impone la base vía RLS).
 
 ### Defensas del endpoint
 
@@ -371,7 +378,7 @@ datos nunca se escriben en los logs: traen renta, deudas y morosidades.
 
 ### Retención de datos
 
-`md_leads` guarda datos personales y financieros. Define un plazo de retención
+`web_leads` guarda datos personales y financieros. Define un plazo de retención
 y decláralo en la política de privacidad.
 
 ## Pendientes conocidos
@@ -379,8 +386,8 @@ y decláralo en la política de privacidad.
 - **Enviar un registro de prueba** y confirmar que llega a HubSpot. La Forms API
   rechaza los campos que no existan en el formulario, así que el formulario del
   portal debe incluir `firstname`, `lastname`, `email` y `phone`.
-- Los datos de `js/projects.js` salen de los sitios públicos de cada inmobiliaria
-  (Brouk exige login): contrastar precios y condiciones de convenio antes de publicar.
+- Los datos de `js/projects.js` (respaldo) salen de los sitios públicos de cada
+  inmobiliaria: contrastar precios y condiciones antes de cargarlos en la intranet.
 - Cada proyecto tiene una sola foto. Para la galería del modal basta con sumar más
   entradas en `fotos` (idealmente `.webp` ≤ 1600 px; con ffmpeg:
   `ffmpeg -i foto.jpg -vf "scale=1600:-2" -c:v libwebp -quality 82 foto.webp`).
