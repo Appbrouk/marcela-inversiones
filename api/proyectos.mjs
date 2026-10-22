@@ -2,7 +2,8 @@
 // Marcela Díaz Inversiones — catálogo y parámetros desde la base compartida
 // Vercel Serverless Function · GET /api/proyectos  →  JavaScript
 //
-// Devuelve `window.MD_PROJECTS` (proyectos activos marcados para mdiaz) y
+// Devuelve `window.MD_PROJECTS` (proyectos activos marcados para mdiaz, sin enlaces a la
+// inmobiliaria: se venden por nuestros medios) y
 // `window.MD_CONFIG` (parámetros publicados desde la intranet). Se carga
 // después de js/projects.js: si la base no responde, el sitio sigue con
 // el catálogo del repositorio. La intranet vive en imobu.cl/intranet.html
@@ -44,7 +45,11 @@ export function proyectoMd(p) {
     descripcion: Array.isArray(p.descripcion) ? p.descripcion.map(String) : [],
     datos,
     fotos,
-    enlace: String(p.enlace || '')
+    // Para los filtros de /proyectos (js/catalogo.js)
+    uf: Number(p.uf) || 0,
+    entrega: p.entrega === 'futura' ? 'futura' : 'inmediata',
+    dorm: Array.isArray(p.dorm) ? p.dorm.map(Number) : [],
+    m2: String(p.m2 || '')
   };
 }
 

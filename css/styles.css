@@ -1042,3 +1042,6 @@ html.modal-open{overflow:hidden}
     --photo-filter:brightness(.92) contrast(1.02);
     color-scheme:dark;
 }
+
+/* Botón "ver todos los proyectos" bajo el carrusel: lleva al catálogo con filtros (/proyectos) */
+.carousel__todos{text-align:center;margin-top:36px}

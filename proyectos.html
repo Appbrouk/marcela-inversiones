@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Proyectos para invertir — Marcela Díaz Inversiones</title>
+  <meta name="description" content="Departamentos para invertir en Santiago seleccionados por Marcela Díaz: filtra por comuna, precio en UF, entrega y dormitorios, y conversa directo con tu asesora.">
+  <meta name="theme-color" content="#FAF0EE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#4A2530" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Proyectos para invertir — Marcela Díaz Inversiones">
+  <meta property="og:description" content="Catálogo de departamentos nuevos en Santiago para inversión. Filtra por comuna, precio, entrega y dormitorios.">
+  <meta property="og:image" content="assets/marce-hero.jpeg">
+  <meta property="og:locale" content="es_CL">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/catalogo.css">
+  <script>
+    /* Antes de pintar: si hay una elección guardada, se aplica ya. Sin esto el
+       navegador pinta el esquema del dispositivo y luego salta al elegido. */
+    try { var t = localStorage.getItem('md-tema'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+  </script>
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="catalogo-page">
+
+<header class="nav is-scrolled" id="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="/" aria-label="Marcela Díaz Inversiones — Inicio">
+      <img src="assets/logo-lockup.png" alt="Marcela Díaz Inversiones" width="233" height="160">
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="/">Inicio</a>
+      <a href="/#servicios">Servicios</a>
+      <a href="/proyectos" class="is-active" aria-current="page">Proyectos</a>
+      <a href="/#sobre-mi">Sobre mí</a>
+    </nav>
+    <a class="btn btn--sm nav__cta" href="/evaluacion">Evalúa tu perfil</a>
+    <button class="tema" type="button" aria-label="Cambiar a modo oscuro" aria-pressed="false" title="Modo oscuro">
+      <svg class="tema__sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"/>
+        <path d="M12 2.6v2.1M12 19.3v2.1M4.2 4.2l1.5 1.5M18.3 18.3l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/>
+      </svg>
+      <svg class="tema__luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main class="catalogo-main">
+  <div class="container">
+
+    <div class="catalogo-head">
+      <div class="kicker kicker--rose">
+        <span class="kicker__line"></span><span>Catálogo</span><span class="kicker__line"></span>
+      </div>
+      <h1 class="display display--lg">Proyectos para invertir</h1>
+      <p class="lead">Departamentos nuevos en Santiago, seleccionados por su potencial de renta. Filtra según lo que buscas y conversemos: la compra se gestiona conmigo, de principio a fin.</p>
+      <p class="catalogo-head__cta"><a class="btn btn--outline" href="/evaluacion">¿Hasta cuánto puedo invertir?</a></p>
+    </div>
+
+    <form class="filtros" id="filtros" aria-label="Filtrar proyectos">
+      <label class="field">
+        <span class="field__label">Comuna</span>
+        <span class="field__control"><select name="comuna" id="f-comuna"><option value="">Todas las comunas</option></select></span>
+      </label>
+      <label class="field">
+        <span class="field__label">Precio UF</span>
+        <span class="field__control"><select name="precio">
+          <option value="">Cualquier precio</option>
+          <option value="0-2500">Hasta UF 2.500</option>
+          <option value="2500-3500">UF 2.500 – 3.500</option>
+          <option value="3500-5000">UF 3.500 – 5.000</option>
+          <option value="5000-999999">Sobre UF 5.000</option>
+        </select></span>
+      </label>
+      <label class="field">
+        <span class="field__label">Entrega</span>
+        <span class="field__control"><select name="entrega">
+          <option value="">Todas</option>
+          <option value="inmediata">Entrega inmediata</option>
+          <option value="futura">Entrega futura</option>
+        </select></span>
+      </label>
+      <label class="field">
+        <span class="field__label">Dormitorios</span>
+        <span class="field__control"><select name="dorm">
+          <option value="">Cualquiera</option>
+          <option value="0">Studio</option>
+          <option value="1">1 dormitorio</option>
+          <option value="2">2 dormitorios</option>
+          <option value="3">3 dormitorios</option>
+        </select></span>
+      </label>
+      <label class="field">
+        <span class="field__label">Ordenar por</span>
+        <span class="field__control"><select name="orden">
+          <option value="destacados">Destacados</option>
+          <option value="precio-asc">Menor precio</option>
+          <option value="precio-desc">Mayor precio</option>
+        </select></span>
+      </label>
+    </form>
+
+    <div class="catalogo-bar">
+      <span class="catalogo-bar__count" id="catalogo-count" role="status">Cargando proyectos…</span>
+      <button type="button" class="btn btn--ghost btn--sm" id="filtros-limpiar">Limpiar filtros</button>
+    </div>
+
+    <div class="catalogo__grid" id="catalogo" role="list" aria-label="Proyectos"></div>
+    <div class="catalogo-vacio" id="catalogo-vacio" hidden>
+      No encontré proyectos con esos filtros por ahora.<br>
+      <a href="/evaluacion">Haz tu evaluación</a> y te muestro alternativas que calcen contigo.
+    </div>
+    <noscript>
+      <p class="catalogo-vacio">Activa JavaScript para ver los proyectos, o <a href="https://wa.me/56951497482" target="_blank" rel="noopener">escríbeme por WhatsApp</a> y te envío las fichas.</p>
+    </noscript>
+
+    <div class="catalogo-cta">
+      <div class="kicker kicker--rose kicker--center">
+        <span class="kicker__line"></span><span>¿No sabes cuál elegir?</span><span class="kicker__line"></span>
+      </div>
+      <p>Completa la evaluación de perfil y te recomiendo los proyectos que calzan con tu renta, tu ahorro y tus objetivos. Sin costo ni compromiso.</p>
+      <div class="actions">
+        <a class="btn" href="/evaluacion">Evaluar mi perfil</a>
+        <a class="btn btn--outline" id="catalogo-wa" href="https://wa.me/56951497482?text=Hola%20Marcela%2C%20quiero%20ayuda%20para%20elegir%20un%20proyecto" target="_blank" rel="noopener">Hablar por WhatsApp</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Modal de proyecto (el mismo de la portada; lo dibuja js/modal.js) -->
+<dialog class="modal" id="proyecto-modal" aria-labelledby="modal-title">
+  <div class="modal__inner">
+    <button class="modal__close" type="button" aria-label="Cerrar" data-close>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+    <div class="gallery" id="modal-gallery-wrap">
+      <div class="gallery__track" id="modal-gallery" aria-live="polite"></div>
+      <button class="gallery__btn gallery__btn--prev" type="button" data-gdir="-1" aria-label="Foto anterior">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg>
+      </button>
+      <button class="gallery__btn gallery__btn--next" type="button" data-gdir="1" aria-label="Foto siguiente">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg>
+      </button>
+      <div class="gallery__foot">
+        <span class="gallery__count" id="modal-count">1 / 1</span>
+        <div class="gallery__thumbs" id="modal-thumbs"></div>
+      </div>
+    </div>
+    <div class="modal__body">
+      <div class="modal__badges">
+        <span class="badge" id="modal-comuna"></span>
+        <span class="badge badge--rose" id="modal-tag" hidden></span>
+      </div>
+      <h3 class="modal__title" id="modal-title"></h3>
+      <p class="modal__dev" id="modal-dev" hidden></p>
+      <p class="modal__price" id="modal-price"></p>
+      <div class="modal__desc" id="modal-desc"></div>
+      <dl class="modal__data" id="modal-data" hidden></dl>
+      <div class="modal__actions">
+        <a class="btn" href="/#registro">Quiero más información</a>
+        <a class="btn btn--outline" id="modal-wa" href="https://wa.me/56951497482" target="_blank" rel="noopener">Conversemos</a>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<footer class="footer">
+  <div class="footer__bottom">
+    <span>© <span id="year">2026</span> Marcela Díaz Inversiones</span>
+    <span>Badajoz 130 of. 1302, Santiago RM · <a href="tel:+56951497482">+56 9 5149 7482</a> · <a href="https://imobu.cl/intranet.html" rel="noopener" title="Acceso para el equipo">Intranet</a></span>
+  </div>
+</footer>
+
+<script src="js/tema.js" defer></script>
+<script src="js/projects.js" defer></script>
+<script src="/api/proyectos" defer></script>
+<script src="js/modal.js" defer></script>
+<script src="js/catalogo.js" defer></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>
