@@ -1,8 +1,8 @@
-/* Marcela Díaz Inversiones — catálogo con filtros (/proyectos)
+/* Marcela Díaz Inversiones — catálogo con filtros (sección #proyectos de la portada)
    Dibuja las tarjetas desde window.MD_PROJECTS (base compartida vía /api/proyectos, o
    js/projects.js como respaldo) y filtra por comuna, precio en UF, entrega, dormitorios y orden.
    Los filtros viven en la URL (?comuna=&precio=&entrega=&dorm=&orden=) para poder compartirlos.
-   El detalle se abre en el mismo modal de la portada (js/modal.js). */
+   El detalle se abre en el modal de js/modal.js. */
 (() => {
   'use strict';
   const d = document;
@@ -109,6 +109,6 @@
     const m = location.hash.match(/^#proyecto=(.+)$/);
     if (m && window.MD_MODAL) window.MD_MODAL.open(decodeURIComponent(m[1]), null);
   };
-  setTimeout(abrirDesdeHash, 150);
+  if (!d.querySelector('.hero')) setTimeout(abrirDesdeHash, 150);   // en la portada lo hace main.js tras el intro
   addEventListener('hashchange', abrirDesdeHash);
 })();

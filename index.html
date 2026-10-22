@@ -230,7 +230,7 @@
     </div>
   </section>
 
-  <!-- Proyectos: las tarjetas se dibujan desde js/projects.js -->
+  <!-- Proyectos: catálogo con filtros (js/catalogo.js) sobre window.MD_PROJECTS (base compartida vía /api/proyectos) -->
   <section id="proyectos" class="section bg-rose">
     <div class="container">
       <div class="section-title" data-reveal>
@@ -238,30 +238,65 @@
           <span class="kicker__line"></span><span>Proyectos</span><span class="kicker__line"></span>
         </div>
         <h2>Oportunidades de inversión</h2>
-        <p>Una selección de proyectos con potencial de renta en Santiago. Regístrate para conocer los detalles.</p>
+        <p>Departamentos nuevos en Santiago con potencial de renta. Filtra por comuna, precio, entrega y dormitorios; la compra se gestiona conmigo, de principio a fin.</p>
       </div>
 
-      <div class="carousel" id="proyectos-carousel">
-        <div class="carousel__track" id="proyectos-track" role="list" aria-label="Proyectos" tabindex="0"></div>
-        <div class="carousel__bar" data-reveal="fade" style="--d:300">
-          <div class="carousel__meta">
-            <span class="carousel__count" id="proyectos-count" aria-live="polite">01 / 01</span>
-            <div class="carousel__dots" id="proyectos-dots" aria-label="Ir al proyecto"></div>
-          </div>
-          <div class="carousel__nav">
-            <button class="carousel__btn" type="button" data-dir="-1" aria-label="Proyecto anterior" aria-controls="proyectos-track">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg>
-            </button>
-            <button class="carousel__btn" type="button" data-dir="1" aria-label="Proyecto siguiente" aria-controls="proyectos-track">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg>
-            </button>
-          </div>
-        </div>
-        <p class="carousel__todos" data-reveal="fade" style="--d:360"><a class="btn btn--outline" href="/proyectos">Ver todos los proyectos</a></p>
-        <noscript>
-          <p class="carousel__noscript">Activa JavaScript para ver los proyectos, o <a href="https://wa.me/56951497482" target="_blank" rel="noopener">escríbeme por WhatsApp</a> y te envío las fichas.</p>
-        </noscript>
+      <form class="filtros" id="filtros" aria-label="Filtrar proyectos" data-reveal="fade" style="--d:120">
+        <label class="field">
+          <span class="field__label">Comuna</span>
+          <span class="field__control"><select name="comuna" id="f-comuna"><option value="">Todas las comunas</option></select></span>
+        </label>
+        <label class="field">
+          <span class="field__label">Precio UF</span>
+          <span class="field__control"><select name="precio">
+            <option value="">Cualquier precio</option>
+            <option value="0-2500">Hasta UF 2.500</option>
+            <option value="2500-3500">UF 2.500 – 3.500</option>
+            <option value="3500-5000">UF 3.500 – 5.000</option>
+            <option value="5000-999999">Sobre UF 5.000</option>
+          </select></span>
+        </label>
+        <label class="field">
+          <span class="field__label">Entrega</span>
+          <span class="field__control"><select name="entrega">
+            <option value="">Todas</option>
+            <option value="inmediata">Entrega inmediata</option>
+            <option value="futura">Entrega futura</option>
+          </select></span>
+        </label>
+        <label class="field">
+          <span class="field__label">Dormitorios</span>
+          <span class="field__control"><select name="dorm">
+            <option value="">Cualquiera</option>
+            <option value="0">Studio</option>
+            <option value="1">1 dormitorio</option>
+            <option value="2">2 dormitorios</option>
+            <option value="3">3 dormitorios</option>
+          </select></span>
+        </label>
+        <label class="field">
+          <span class="field__label">Ordenar por</span>
+          <span class="field__control"><select name="orden">
+            <option value="destacados">Destacados</option>
+            <option value="precio-asc">Menor precio</option>
+            <option value="precio-desc">Mayor precio</option>
+          </select></span>
+        </label>
+      </form>
+
+      <div class="catalogo-bar">
+        <span class="catalogo-bar__count" id="catalogo-count" role="status">Cargando proyectos…</span>
+        <button type="button" class="btn btn--ghost btn--sm" id="filtros-limpiar">Limpiar filtros</button>
       </div>
+
+      <div class="catalogo__grid" id="catalogo" role="list" aria-label="Proyectos"></div>
+      <div class="catalogo-vacio" id="catalogo-vacio" hidden>
+        No encontré proyectos con esos filtros por ahora.<br>
+        <a href="#evaluador">Haz tu evaluación</a> y te muestro alternativas que calcen contigo.
+      </div>
+      <noscript>
+        <p class="catalogo-vacio">Activa JavaScript para ver los proyectos, o <a href="https://wa.me/56951497482" target="_blank" rel="noopener">escríbeme por WhatsApp</a> y te envío las fichas.</p>
+      </noscript>
     </div>
   </section>
 
@@ -435,6 +470,7 @@
 <script src="js/tema.js" defer></script>
 <script src="js/modal.js" defer></script>
 <script src="js/main.js" defer></script>
+<script src="js/catalogo.js" defer></script>
 <script src="js/evaluacion.js" defer></script>
 
 <!-- Vercel Web Analytics. Es la integración para HTML plano: no usa el paquete
