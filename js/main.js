@@ -8,20 +8,23 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
-  /* ---------- HubSpot ----------
-     El formulario se envía a la Forms API de HubSpot. `portalId` y `formGuid` no son
-     secretos: van a la vista en cualquier formulario embebido de HubSpot, así que
-     pueden vivir aquí. Los datos salen del navegador directo a HubSpot, sin backend.
+  /* ---------- Parámetros publicados desde la intranet ----------
+     /api/proyectos (cargado antes que este archivo) deja en window.MD_CONFIG los
+     parámetros de mdiaz.cl que se editan en imobu.cl/intranet.html: WhatsApp,
+     HubSpot, supuestos financieros. Si no llega, valen los valores de aquí. */
+  const MD = (window.MD_CONFIG && typeof window.MD_CONFIG === 'object') ? window.MD_CONFIG : {};
 
-     Para obtenerlos: HubSpot → Marketing → Formularios → crea o abre el formulario →
-     Compartir / Insertar. En el fragmento aparecen `portalId` (tu Hub ID) y `formId`.
+  /* ---------- HubSpot ----------
+     El registro se guarda primero en la base compartida (vía /api/formulario, de
+     donde lo lee la intranet) y además se copia a la Forms API de HubSpot.
+     `portalId` y `formGuid` no son secretos: van a la vista en cualquier
+     formulario embebido de HubSpot. Se editan en la intranet (Web MD Invest →
+     Formularios y HubSpot); estos valores son solo el respaldo.
 
      El formulario en HubSpot debe tener al menos estas propiedades de contacto:
-     firstname, lastname, email, phone.
-
-     Mientras `portalId` o `formGuid` estén vacíos, el sitio sigue en modo demo
-     (valida y muestra el éxito sin enviar nada). */
-  const HUBSPOT = {
+     firstname, lastname, email, phone. Con `portalId` o `formGuid` vacíos no se
+     copia a HubSpot. */
+  const HUBSPOT = Object.assign({
     portalId: '51801072',
     formGuid: 'a8d33577-b4ec-4884-a984-08a08e1fe5e0',
     /* Región del portal: 'na1' (por defecto), 'eu1', etc. Aparece en la URL de HubSpot. */
@@ -29,12 +32,10 @@
     /* Solo si el formulario tiene activado el consentimiento (RGPD) en HubSpot.
        Es el ID del tipo de suscripción; déjalo en 0 si no lo usas. */
     subscriptionTypeId: 0,
-  };
+  }, MD.hubspot || {});
 
-  /* Alternativa sin HubSpot: un endpoint propio que reciba el JSON tal cual
-     (Formspree, un webhook, una función serverless). Se usa solo si HUBSPOT
-     no está configurado. */
-  const FORM_ENDPOINT = '';
+  /* Receptor propio (api/formulario.mjs): guarda el registro en web_leads. */
+  const FORM_ENDPOINT = '/api/formulario';
 
   /* ---------- Proyectos: carrusel + modal ----------
      Los datos viven en js/projects.js (window.MD_PROJECTS). Aquí solo se dibujan:
@@ -45,7 +46,7 @@
   const track = d.getElementById('proyectos-track');
   const carousel = d.getElementById('proyectos-carousel');
   const dialog = d.getElementById('proyecto-modal');
-  const WHATSAPP = '56951497482';
+  const WHATSAPP = String((MD.sitio && MD.sitio.whatsapp) || '56951497482').replace(/\D/g, '');
 
   const pad2 = (n) => String(n).padStart(2, '0');
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
@@ -840,17 +841,21 @@
       const data = Object.fromEntries(new FormData(form).entries());
       data.origen = location.href;
       try {
+        /* 1. Base compartida (intranet). Si falla, el registro no se da por enviado. */
+        const res = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ tipo: 'registro', datos: data, pagina: 'index' }),
+        });
+        if (!res.ok) {
+          const err = new Error('HTTP ' + res.status);
+          err.invalidInput = res.status === 400;
+          err.limite = res.status === 429;
+          throw err;
+        }
+        /* 2. Copia a HubSpot, sin bloquear: el dato ya está a salvo en la base. */
         if (hubspotReady()) {
-          await sendToHubspot(data);
-        } else if (FORM_ENDPOINT) {
-          const res = await fetch(FORM_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(data),
-          });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-        } else {
-          await new Promise((r) => setTimeout(r, 700));
+          try { await sendToHubspot(data); } catch (e) { /* queda registrado en la intranet igual */ }
         }
         form.hidden = true;
         ok.hidden = false;
@@ -859,8 +864,10 @@
         submit.disabled = false;
         submit.classList.remove('is-loading');
         showError(err && err.invalidInput
-          ? 'Revisa tus datos: ' + err.message
-          : 'No pudimos enviar tu registro. Inténtalo de nuevo o escríbenos por WhatsApp.');
+          ? 'Revisa tu nombre, correo y teléfono e inténtalo de nuevo.'
+          : err && err.limite
+            ? 'Recibimos varios envíos seguidos desde este navegador. Espera unos minutos o escríbenos por WhatsApp.'
+            : 'No pudimos enviar tu registro. Inténtalo de nuevo o escríbenos por WhatsApp.');
       }
     });
   }

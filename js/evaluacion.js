@@ -6,7 +6,7 @@
      · Sin sistema de asesores: aquí la asesora es una, Marcela.
      · El catálogo sale de window.MD_PROJECTS (js/projects.js), leyendo el
        precio en UF del campo de texto "desde".
-     · El envío va a /api/evaluacion (función serverless propia), no al
+     · El envío va a /api/formulario (función serverless propia), no al
        receptor multiformulario de IMOBU.
 
    Los supuestos financieros viven en CFG y se muestran al pie del panel:
@@ -319,17 +319,21 @@
   if (!form) return;
 
   /* ---------- Supuestos del pre-diagnóstico ----------
-     La UF es un valor fijo: revísala cada cierto tiempo (es referencial, no
-     se usa para cerrar ninguna operación). */
+     Se editan en la intranet (imobu.cl/intranet.html → Web MD Invest → Supuestos
+     financieros) y llegan en window.MD_CONFIG vía /api/proyectos. Estos valores
+     son el respaldo si la base no responde. La UF es referencial: no se usa
+     para cerrar ninguna operación. */
+  var MD = (window.MD_CONFIG && typeof window.MD_CONFIG === 'object') ? window.MD_CONFIG : {};
+  var F = MD.finanzas || {};
   var CFG = {
-    UF: 41065,
-    TASA_ANUAL: 0.045,
-    PLAZO_MESES: 25 * 12,
-    PIE: 0.20,
-    DIV_MAX: 0.25,      // dividendo máximo como fracción de la renta líquida
-    CARGA_MAX: 0.45,    // carga financiera total máxima
-    RENTA_MIN: 650000,  // renta mínima referencial de algunos bancos
-    WHATSAPP: '56951497482'
+    UF: Number(F.uf) || 41065,
+    TASA_ANUAL: (Number(F.tasaAnual) || 4.5) / 100,
+    PLAZO_MESES: (Number(F.plazoAnos) || 25) * 12,
+    PIE: (Number(F.piePct) || 20) / 100,
+    DIV_MAX: (Number(F.dividendoMaxPct) || 25) / 100,   // dividendo máximo como fracción de la renta líquida
+    CARGA_MAX: (Number(F.cargaMaxPct) || 45) / 100,     // carga financiera total máxima
+    RENTA_MIN: Number(F.rentaMinima) || 650000,         // renta mínima referencial de algunos bancos
+    WHATSAPP: String((MD.sitio && MD.sitio.whatsapp) || '56951497482').replace(/\D/g, '')
   };
 
   /* ---------- Formato y matemática ---------- */
@@ -620,10 +624,10 @@
     btnSubmit.classList.add('is-loading');
     stepError.hidden = true;
 
-    fetch('/api/evaluacion', {
+    fetch('/api/formulario', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ datos: datos, pagina: 'evaluacion' })
+      body: JSON.stringify({ tipo: 'evaluacion', datos: datos, pagina: 'evaluacion' })
     }).then(function (res) {
       if (!res.ok) throw new Error(res.status === 429
         ? 'Recibimos varios envíos seguidos desde este navegador. Espera unos minutos o escríbenos por WhatsApp.'

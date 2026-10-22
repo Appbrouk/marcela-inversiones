@@ -1,9 +1,13 @@
 // ─────────────────────────────────────────────────────────────
-// Marcela Díaz Inversiones — receptor del evaluador de perfil
-// Vercel Serverless Function (Node 18+) · POST /api/evaluacion
+// Marcela Díaz Inversiones — receptor de formularios (registro y evaluador de perfil)
+// Vercel Serverless Function (Node 18+) · POST /api/formulario  { tipo, datos, pagina, turnstileToken }
 //
 // Es .mjs a propósito: así usa ESM sin necesidad de un package.json, que
 // cambiaría cómo Vercel detecta el proyecto (hoy es estático, sin build).
+//
+// Cada envío se guarda en la tabla compartida web_leads (sitio = 'mdiaz'), de
+// donde lo lee la intranet de imobu.cl/intranet.html junto con los de IMOBU.
+// Esquema: imobu-web/supabase/web.sql.
 //
 // Variables de entorno — se configuran en Vercel, nunca en el código:
 //
@@ -11,11 +15,9 @@
 //                     Ej: https://mdiaz.cl,https://www.mdiaz.cl
 //                     Sin esto la función rechaza todo: es el cierre por omisión.
 //
-//   SUPABASE_URL      Obligatorias para guardar. La clave es la ANON, no la
-//   SUPABASE_ANON_KEY service_role: la tabla md_leads solo le concede INSERT
-//                     (ver supabase/leads.sql). Esta base está compartida con
-//                     la operación de Brouk, así que una service_role aquí
-//                     daría acceso a todo si se filtrara.
+//   SUPABASE_URL      Obligatorias para guardar. La clave es la ANON (pública),
+//   SUPABASE_ANON_KEY no la service_role: web_leads solo le concede INSERT en
+//                     columnas fijas, no puede leer nada (lo impone la base).
 //
 //   TURNSTILE_SECRET  Opcional pero recomendada. Anti-bots de Cloudflare.
 //   RESEND_API_KEY    Opcionales. Avisan por correo de cada evaluación.
@@ -34,9 +36,11 @@ const VENTANA_MS = 10 * 60 * 1000;
 // Para eso haría falta un almacén compartido (Upstash/Redis).
 const intentos = new Map();
 
-// Lista blanca: [largo máximo, obligatorio]. Lo que no esté aquí se descarta,
-// así un campo inyectado en el formulario del cliente nunca llega a la base.
+// Lista blanca por tipo de formulario: [largo máximo, obligatorio]. Lo que no esté
+// aquí se descarta, así un campo inyectado en el formulario nunca llega a la base.
 const CAMPOS = {
+  registro: { nombre: [80, true], email: [120, true], telefono: [20], acepta: [5, true], origen: [200] },
+  evaluacion: {
   nombre: [80, true], apellido: [80, true], email: [120, true], telefono: [20, true],
   edad: [3, true], comuna_residencia: [80, true], estado_civil: [40, true], residencia: [60, true],
   situacion: [60, true], antiguedad: [30, true], renta: [20, true], otros_ingresos: [20],
@@ -45,6 +49,7 @@ const CAMPOS = {
   complementa: [10, true], comp_relacion: [80], comp_renta: [20], comp_situacion: [60], comp_antiguedad: [30],
   objetivo: [40, true], cantidad: [10, true], comunas: [400], entrega: [60], plazo: [60, true],
   proyecto: [120], canal: [20, true], horario: [40], comentarios: [1000], acepto: [5, true],
+  },
 };
 
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/i;
@@ -70,10 +75,11 @@ function limiteExcedido(ip) {
   return lista.length > LIMITE_POR_IP;
 }
 
-function validar(datos) {
-  if (typeof datos !== 'object' || datos === null || Array.isArray(datos)) return null;
+function validar(tipo, datos) {
+  const reglas = CAMPOS[tipo];
+  if (!reglas || typeof datos !== 'object' || datos === null || Array.isArray(datos)) return null;
   const limpio = {};
-  for (const [campo, [max, obligatorio]] of Object.entries(CAMPOS)) {
+  for (const [campo, [max, obligatorio]] of Object.entries(reglas)) {
     let v = datos[campo];
     if (Array.isArray(v)) v = v.map(String).join(', ');
     if (v == null || v === '') {
@@ -84,8 +90,11 @@ function validar(datos) {
     limpio[campo] = limpiar(v, max);
   }
   if (!EMAIL_RE.test(limpio.email)) return null;
-  const digitos = limpio.telefono.replace(/\D/g, '');
-  if (digitos.length < 8 || digitos.length > 15) return null;
+  if (limpio.telefono) {
+    const digitos = limpio.telefono.replace(/\D/g, '');
+    if (digitos.length < 8 || digitos.length > 15) return null;
+  }
+  if (limpio.origen && !/^https:\/\/[^\s<>"]+$/.test(limpio.origen)) delete limpio.origen;
 
   // El pre-diagnóstico se acepta solo como números: lo calcula el navegador,
   // así que no es un dato de confianza y Marcela lo recalcula de todas formas.
@@ -113,16 +122,16 @@ async function verificarTurnstile(token, ip) {
 
 // Guarda y avisa. Solo falla si NINGÚN destino recibió el lead: si el correo
 // cae pero la base lo guardó, la evaluación no se pierde.
-async function entregar(datos, pagina) {
+async function entregar(tipo, datos, pagina) {
   const tareas = [];
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_ANON_KEY;
 
   if (url && key) {
-    tareas.push(fetch(`${url.replace(/\/+$/, '')}/rest/v1/md_leads`, {
+    tareas.push(fetch(`${url.replace(/\/+$/, '')}/rest/v1/web_leads`, {
       method: 'POST',
       headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ tipo: 'evaluacion', pagina, datos }),
+      body: JSON.stringify({ sitio: 'mdiaz', tipo, pagina, datos }),
     }));
   }
 
@@ -137,8 +146,8 @@ async function entregar(datos, pagina) {
       body: JSON.stringify({
         from: process.env.FROM_EMAIL,
         to: process.env.NOTIFY_EMAIL.split(',').map((s) => s.trim()).filter(Boolean),
-        subject: `Evaluación de perfil: ${datos.nombre} ${datos.apellido}` + (pre ? ` · ${pre.status}` : ''),
-        html: `<p>Nueva evaluación desde <b>${escHtml(pagina)}</b></p><table>${filas}</table>`,
+        subject: (tipo === 'evaluacion' ? `Evaluación de perfil: ${datos.nombre} ${datos.apellido || ''}` : `Nuevo registro web: ${datos.nombre}`) + (pre ? ` · ${pre.status}` : ''),
+        html: `<p>Formulario <b>${escHtml(tipo)}</b> desde <b>${escHtml(pagina)}</b></p><table>${filas}</table>`,
       }),
     }));
   }
@@ -173,20 +182,21 @@ export default async function handler(req, res) {
   // Trampa para bots: se responde OK sin guardar, para no darles la pista.
   if (cuerpo.datos && cuerpo.datos.sitio_web_empresa) return res.status(200).json({ ok: true });
 
-  const datos = validar(cuerpo.datos);
+  const tipo = String(cuerpo.tipo || 'evaluacion');
+  const datos = validar(tipo, cuerpo.datos);
   if (!datos) return res.status(400).json({ ok: false, error: 'datos' });
 
   try {
     if (!(await verificarTurnstile(cuerpo.turnstileToken, ip))) return res.status(403).json({ ok: false, error: 'verificacion' });
-    await entregar(datos, limpiar(cuerpo.pagina || 'evaluacion', 60));
+    await entregar(tipo, datos, limpiar(cuerpo.pagina || tipo, 60));
     return res.status(200).json({ ok: true });
   } catch (e) {
     // Nunca se registran los datos en los logs: traen renta, deudas y morosidades.
     if (e.message === 'sin-destino') {
-      console.error('evaluacion: no hay destino configurado (falta SUPABASE_URL/SUPABASE_ANON_KEY o Resend)');
+      console.error('formulario: no hay destino configurado (falta SUPABASE_URL/SUPABASE_ANON_KEY o Resend)');
       return res.status(503).json({ ok: false, error: 'sin-destino' });
     }
-    console.error('evaluacion: ningún destino aceptó el lead');
+    console.error('formulario: ningún destino aceptó el lead', tipo);
     return res.status(502).json({ ok: false, error: 'destino' });
   }
 }
